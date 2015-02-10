@@ -80,6 +80,8 @@ public class SpongeIRC {
         } catch (CraftIRCUnableToStartException e) {
             this.logger.error("Uh oh", e);
         }
+        this.craftIRC.getFilterManager().registerArgumentProvider(SpongeIRC.class, () -> SpongeIRC.this);
+        this.craftIRC.getFilterManager().registerType(PermissionFilter.class);
         this.craftIRC.getEndpointManager().registerArgumentProvider(SpongeIRC.class, () -> SpongeIRC.this);
         this.craftIRC.getEndpointManager().registerType(MinecraftEndpoint.class);
     }
