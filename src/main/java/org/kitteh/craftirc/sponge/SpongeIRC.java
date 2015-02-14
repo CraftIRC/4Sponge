@@ -56,6 +56,7 @@ public class SpongeIRC {
             this.craftIRC = new CraftIRC(new Log4JWrapper(this.logger), this.configDir);
         } catch (CraftIRCUnableToStartException e) {
             this.logger.error("Uh oh", e);
+            return;
         }
         this.craftIRC.getFilterManager().registerArgumentProvider(SpongeIRC.class, () -> SpongeIRC.this);
         this.craftIRC.getFilterManager().registerType(PermissionFilter.class);
