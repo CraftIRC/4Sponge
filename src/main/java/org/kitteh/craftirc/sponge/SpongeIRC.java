@@ -26,6 +26,7 @@ package org.kitteh.craftirc.sponge;
 import com.google.inject.Inject;
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.exceptions.CraftIRCUnableToStartException;
+import org.kitteh.craftirc.sponge.util.Log4JWrapper;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.event.state.InitializationEvent;
@@ -37,6 +38,7 @@ import java.io.File;
 
 @Plugin(id = "CraftIRC", name = "CraftIRC", version = SpongeIRC.MAGIC_VERSION)
 public class SpongeIRC {
+    // Field set by javassist-maven-plugin, confirmed by unit test
     static final String MAGIC_VERSION = "SET_BY_MAGIC";
 
     private CraftIRC craftIRC;
@@ -51,32 +53,7 @@ public class SpongeIRC {
     @Subscribe
     public void init(InitializationEvent event) {
         try {
-            this.craftIRC = new CraftIRC(new org.kitteh.craftirc.util.Logger() {
-                @Override
-                public void info(String info) {
-                    SpongeIRC.this.logger.info(info);
-                }
-
-                @Override
-                public void warning(String warn) {
-                    SpongeIRC.this.logger.warn(warn);
-                }
-
-                @Override
-                public void warning(String warn, Throwable thrown) {
-                    SpongeIRC.this.logger.warn(warn, thrown);
-                }
-
-                @Override
-                public void severe(String severe) {
-                    SpongeIRC.this.logger.error(severe);
-                }
-
-                @Override
-                public void severe(String severe, Throwable thrown) {
-                    SpongeIRC.this.logger.error(severe, thrown);
-                }
-            }, this.configDir);
+            this.craftIRC = new CraftIRC(new Log4JWrapper(this.logger), this.configDir);
         } catch (CraftIRCUnableToStartException e) {
             this.logger.error("Uh oh", e);
         }
