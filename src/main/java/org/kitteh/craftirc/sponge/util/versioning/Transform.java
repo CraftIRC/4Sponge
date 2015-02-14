@@ -57,9 +57,8 @@ public class Transform extends ClassTransformer {
 
     @Override
     public void configure(final Properties properties) {
-        if (properties == null) {
+        if (properties == null || (this.version = properties.getProperty("version")) == null) {
             throw new AssertionError("Version not set!");
         }
-        this.version = properties.getProperty("version");
     }
 }
