@@ -11,6 +11,7 @@
     <url>http://kitteh.org/</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <javassist-plugin.version>1.1.0-KITTEH</javassist-plugin.version>
     </properties>
     <packaging>jar</packaging>
 
@@ -24,6 +25,13 @@
             <url>http://repo.spongepowered.org/maven</url>
         </repository>
     </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>kitteh-repo</id>
+            <url>http://repo.kitteh.org/content/groups/public</url>
+        </pluginRepository>
+    </pluginRepositories>
 
     <dependencies>
         <dependency>
@@ -45,7 +53,7 @@
         <dependency>
             <groupId>de.icongmbh.oss.maven.plugins</groupId>
             <artifactId>javassist-maven-plugin</artifactId>
-            <version>1.1.0</version>
+            <version>${javassist-plugin.version}</version>
             <optional>true</optional>
             <scope>provided</scope>
         </dependency>
@@ -73,7 +81,7 @@
             <plugin>
                 <groupId>de.icongmbh.oss.maven.plugins</groupId>
                 <artifactId>javassist-maven-plugin</artifactId>
-                <version>1.1.0</version>
+                <version>${javassist-plugin.version}</version>
                 <configuration>
                     <includeTestClasses>false</includeTestClasses>
                     <transformerClasses>
