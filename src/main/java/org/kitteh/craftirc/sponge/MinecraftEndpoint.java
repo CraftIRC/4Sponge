@@ -84,7 +84,7 @@ public class MinecraftEndpoint extends Endpoint {
             recipients.add(new MinecraftPlayer(player.getName(), player.getUniqueId()));
         } */
         // String format = event.getFormat(); TODO wait for format
-        String message = event.getMessage();
+        String message = event.getMessage().toLegacy();
         String sender = event.getPlayer().getName();
         data.put(Endpoint.MESSAGE_FORMAT, "<%1$s> %2$s"); // TODO wait for format
         data.put(Endpoint.MESSAGE_TEXT, message);
