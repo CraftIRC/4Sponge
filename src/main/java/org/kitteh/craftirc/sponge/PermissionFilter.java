@@ -64,7 +64,7 @@ public final class PermissionFilter extends Filter {
             Iterator<MinecraftPlayer> iterator = players.iterator();
             while (iterator.hasNext()) {
                 MinecraftPlayer minecraftPlayer = iterator.next();
-                Optional<Player> player = this.plugin.getGame().getServer().get().getPlayer(minecraftPlayer.getName());
+                Optional<Player> player = this.plugin.getGame().getServer().getPlayer(minecraftPlayer.getName());
                 if (!player.isPresent() || !player.get().hasPermission(this.getPermission())) {
                     iterator.remove();
                 }

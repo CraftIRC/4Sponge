@@ -23,16 +23,15 @@
  */
 package org.kitteh.craftirc.sponge;
 
-import com.google.common.base.Optional;
-import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.endpoint.Endpoint;
 import org.kitteh.craftirc.endpoint.Message;
 import org.kitteh.craftirc.endpoint.TargetedMessage;
 import org.kitteh.craftirc.util.MinecraftPlayer;
 import org.kitteh.craftirc.util.loadable.Loadable;
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.event.entity.living.player.PlayerChatEvent;
-import org.spongepowered.api.util.event.Subscribe;
+import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.entity.player.PlayerChatEvent;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.Texts;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -57,7 +56,7 @@ public class MinecraftEndpoint extends Endpoint {
 
     @Override
     protected void preProcessReceivedMessage(TargetedMessage message) {
-        List<MinecraftPlayer> players = this.plugin.getGame().getServer().get().getOnlinePlayers().stream().map(player -> new MinecraftPlayer(player.getName(), player.getUniqueId())).collect(Collectors.toCollection(LinkedList::new));
+        List<MinecraftPlayer> players = this.plugin.getGame().getServer().getOnlinePlayers().stream().map(player -> new MinecraftPlayer(player.getName(), player.getUniqueId())).collect(Collectors.toCollection(LinkedList::new));
         message.getCustomData().put(MinecraftEndpoint.PLAYER_LIST, players);
     }
 
@@ -72,7 +71,7 @@ public class MinecraftEndpoint extends Endpoint {
                 player.get().sendMessage(message.getCustomMessage());
             }
         }*/
-        this.plugin.getGame().getServer().get().getOnlinePlayers().forEach(player -> player.sendMessage(message.getCustomMessage()));
+        this.plugin.getGame().getServer().getOnlinePlayers().forEach(player -> player.sendMessage(Texts.of(message.getCustomMessage())));
     }
 
     @Subscribe
@@ -84,12 +83,17 @@ public class MinecraftEndpoint extends Endpoint {
             recipients.add(new MinecraftPlayer(player.getName(), player.getUniqueId()));
         } */
         // String format = event.getFormat(); TODO wait for format
-        String message = event.getMessage().toLegacy();
-        String sender = event.getPlayer().getName();
-        data.put(Endpoint.MESSAGE_FORMAT, "<%1$s> %2$s"); // TODO wait for format
-        data.put(Endpoint.MESSAGE_TEXT, message);
-        // data.put(MinecraftEndpoint.PLAYER_LIST, recipients); TODO wait for recipient tracking
-        data.put(Endpoint.SENDER_NAME, sender);
-        this.plugin.getCraftIRC().getEndpointManager().sendMessage(new Message(this, String.format("<%1$s> %2$s", sender, message), data)); // TODO wait for format
+        Text text = event.getMessage();
+        if (text instanceof Text.Translatable) {
+            Text.Translatable trans = (Text.Translatable) text;
+            String message = Texts.toPlain((Text) trans.getArguments().get(1));
+            String sender = Texts.toPlain((Text) trans.getArguments().get(0));
+            String format = trans.getTranslation().get();
+            data.put(Endpoint.MESSAGE_FORMAT, format);
+            data.put(Endpoint.MESSAGE_TEXT, message);
+            // data.put(MinecraftEndpoint.PLAYER_LIST, recipients); TODO wait for recipient tracking
+            data.put(Endpoint.SENDER_NAME, sender);
+            this.plugin.getCraftIRC().getEndpointManager().sendMessage(new Message(this, String.format(format, sender, message), data));
+        }
     }
 }

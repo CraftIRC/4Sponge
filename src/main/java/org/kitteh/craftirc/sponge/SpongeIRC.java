@@ -32,7 +32,7 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.event.state.InitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.service.config.ConfigDir;
-import org.spongepowered.api.util.event.Subscribe;
+import org.spongepowered.api.event.Subscribe;
 
 import java.io.File;
 
