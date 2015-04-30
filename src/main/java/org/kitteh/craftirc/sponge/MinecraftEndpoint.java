@@ -36,6 +36,7 @@ import org.spongepowered.api.text.Texts;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -88,7 +89,7 @@ public class MinecraftEndpoint extends Endpoint {
             Text.Translatable trans = (Text.Translatable) text;
             String message = Texts.toPlain((Text) trans.getArguments().get(1));
             String sender = Texts.toPlain((Text) trans.getArguments().get(0));
-            String format = trans.getTranslation().get();
+            String format = trans.getTranslation().get(Locale.ENGLISH);
             data.put(Endpoint.MESSAGE_FORMAT, format);
             data.put(Endpoint.MESSAGE_TEXT, message);
             // data.put(MinecraftEndpoint.PLAYER_LIST, recipients); TODO wait for recipient tracking
