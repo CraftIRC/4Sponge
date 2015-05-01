@@ -11,7 +11,8 @@ public class AnnotatedVersionTest {
     @Test
     public void test() {
         Plugin annotation = SpongeIRC.class.getAnnotation(Plugin.class);
-        Assert.assertTrue("Failed to set version! Annotation eaten!", annotation != null);
-        Assert.assertTrue("Failed to set version! Found: " + annotation.version(), !annotation.version().equals(SpongeIRC.MAGIC_VERSION));
+        Assert.assertNotNull("Failed to set version! Annotation eaten!", annotation);
+        Assert.assertNotEquals("Failed to set version! Annotation not set!", "SET_BY_MAGIC", annotation.version());
+        Assert.assertEquals("Failed to set version! Something horrible has happened!", "SET_BY_MAGIC", SpongeIRC.MAGIC_VERSION);
     }
 }

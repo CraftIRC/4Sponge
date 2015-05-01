@@ -39,7 +39,7 @@ import java.io.File;
 @Plugin(id = "CraftIRC", name = "CraftIRC", version = SpongeIRC.MAGIC_VERSION)
 public class SpongeIRC {
     // Field set by javassist-maven-plugin, confirmed by unit test
-    static final String MAGIC_VERSION = "SET_BY_MAGIC";
+    static final String MAGIC_VERSION = "SET_BY_MAGIC"; // KEEP THIS VALUE EQUAL TO SET_BY_MAGIC FOR UNIT TEST
 
     private CraftIRC craftIRC;
     @Inject
