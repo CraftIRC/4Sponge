@@ -67,9 +67,9 @@ public class MinecraftEndpoint extends Endpoint {
         List<MinecraftPlayer> recipients = (List<MinecraftPlayer>) message.getCustomData().get(MinecraftEndpoint.PLAYER_LIST);
         /* TODO wait for recipient tracking
         for (MinecraftPlayer recipient : recipients) {
-            Optional<Player> player = this.plugin.getGame().getServer().get().getPlayer(recipient.getName());
+            Optional<Player> player = this.plugin.getGame().getServer().getPlayer(recipient.getName());
             if (player.isPresent()) {
-                player.get().sendMessage(message.getCustomMessage());
+                player.get().sendMessage(Texts.of(message.getCustomMessage()));
             }
         }*/
         this.plugin.getGame().getServer().getOnlinePlayers().forEach(player -> player.sendMessage(Texts.of(message.getCustomMessage())));
