@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
  */
 @Loadable.Type(name = "minecraft")
 public class MinecraftEndpoint extends Endpoint {
-    public static final String PLAYER_LIST = "RECIPIENT_NAMES";
+    public static final String RECIPIENT_NAMES = "RECIPIENT_NAMES";
 
     private final SpongeIRC plugin;
 
@@ -62,13 +62,13 @@ public class MinecraftEndpoint extends Endpoint {
     @Override
     protected void preProcessReceivedMessage(TargetedMessage message) {
         Set<MinecraftPlayer> players = this.playerCollectionToMinecraftPlayer(this.plugin.getGame().getServer().getOnlinePlayers());
-        message.getCustomData().put(MinecraftEndpoint.PLAYER_LIST, players);
+        message.getCustomData().put(MinecraftEndpoint.RECIPIENT_NAMES, players);
     }
 
     @Override
     protected void receiveMessage(TargetedMessage message) {
         @SuppressWarnings("unchecked")
-        List<MinecraftPlayer> recipients = (List<MinecraftPlayer>) message.getCustomData().get(MinecraftEndpoint.PLAYER_LIST);
+        Set<MinecraftPlayer> recipients = (Set<MinecraftPlayer>) message.getCustomData().get(MinecraftEndpoint.RECIPIENT_NAMES);
         for (MinecraftPlayer recipient : recipients) {
             Optional<Player> player = this.plugin.getGame().getServer().getPlayer(recipient.getName());
             if (player.isPresent()) {
@@ -92,7 +92,7 @@ public class MinecraftEndpoint extends Endpoint {
                 data.put(Endpoint.MESSAGE_FORMAT, format);
                 data.put(Endpoint.MESSAGE_TEXT, message);
                 Set<MinecraftPlayer> recipients = this.playerCollectionToMinecraftPlayer(this.plugin.getGame().getServer().getOnlinePlayers()); // TODO Collect recipients per event here.
-                data.put(MinecraftEndpoint.PLAYER_LIST, recipients);
+                data.put(MinecraftEndpoint.RECIPIENT_NAMES, recipients);
                 data.put(Endpoint.SENDER_NAME, sender);
                 this.plugin.getCraftIRC().getEndpointManager().sendMessage(new Message(this, String.format(format, sender, message), data));
             }
