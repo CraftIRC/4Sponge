@@ -75,7 +75,6 @@ public class MinecraftEndpoint extends Endpoint {
                 player.get().sendMessage(Texts.of(message.getCustomMessage()));
             }
         }
-        this.plugin.getGame().getServer().getOnlinePlayers().forEach(player -> player.sendMessage(Texts.of(message.getCustomMessage())));
     }
 
     @Subscribe
