@@ -84,7 +84,7 @@ public class MinecraftEndpoint extends Endpoint {
         if (text instanceof Text.Translatable) {
             Text.Translatable trans = (Text.Translatable) text;
             List<Object> args = trans.getArguments();
-            if (args.size() < 2 && args.get(0) instanceof Text && args.get(1) instanceof Text) {
+            if (args.size() == 2 && args.get(0) instanceof Text && args.get(1) instanceof Text) {
                 String message = Texts.toPlain((Text) args.get(1));
                 String sender = Texts.toPlain((Text) args.get(0));
                 String format = trans.getTranslation().get(Locale.ENGLISH);
