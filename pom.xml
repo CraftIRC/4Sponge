@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.kitteh</groupId>
             <artifactId>craftirc</artifactId>
-            <version>4.0.0-SNAPSHOT</version>
+            <version>4.0.0</version>
             <type>jar</type>
             <optional>true</optional>
             <scope>compile</scope>
