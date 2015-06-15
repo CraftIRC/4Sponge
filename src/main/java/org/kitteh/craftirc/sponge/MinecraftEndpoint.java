@@ -35,6 +35,7 @@ import org.spongepowered.api.event.entity.player.PlayerChatEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -54,19 +55,19 @@ public class MinecraftEndpoint extends Endpoint {
 
     private final SpongeIRC plugin;
 
-    public MinecraftEndpoint(SpongeIRC plugin) {
+    public MinecraftEndpoint(@Nonnull SpongeIRC plugin) {
         this.plugin = plugin;
         this.plugin.getGame().getEventManager().register(plugin, this);
     }
 
     @Override
-    protected void preProcessReceivedMessage(TargetedMessage message) {
+    protected void preProcessReceivedMessage(@Nonnull TargetedMessage message) {
         Set<MinecraftPlayer> players = this.playerCollectionToMinecraftPlayer(this.plugin.getGame().getServer().getOnlinePlayers());
         message.getCustomData().put(MinecraftEndpoint.RECIPIENT_NAMES, players);
     }
 
     @Override
-    protected void receiveMessage(TargetedMessage message) {
+    protected void receiveMessage(@Nonnull TargetedMessage message) {
         @SuppressWarnings("unchecked")
         Set<MinecraftPlayer> recipients = (Set<MinecraftPlayer>) message.getCustomData().get(MinecraftEndpoint.RECIPIENT_NAMES);
         for (MinecraftPlayer recipient : recipients) {
@@ -78,7 +79,7 @@ public class MinecraftEndpoint extends Endpoint {
     }
 
     @Subscribe
-    public void onChat(PlayerChatEvent event) {
+    public void onChat(@Nonnull PlayerChatEvent event) {
         Map<String, Object> data = new HashMap<>();
         Text text = event.getMessage();
         if (text instanceof Text.Translatable) {
@@ -98,7 +99,8 @@ public class MinecraftEndpoint extends Endpoint {
         }
     }
 
-    private Set<MinecraftPlayer> playerCollectionToMinecraftPlayer(Collection<Player> collection) {
+    @Nonnull
+    private Set<MinecraftPlayer> playerCollectionToMinecraftPlayer(@Nonnull Collection<Player> collection) {
         return collection.stream().map(player -> new MinecraftPlayer(player.getName(), player.getUniqueId())).collect(Collectors.toCollection(HashSet::new));
     }
 }

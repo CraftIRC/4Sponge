@@ -34,6 +34,7 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.service.config.ConfigDir;
 import org.spongepowered.api.event.Subscribe;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 
 @Plugin(id = "CraftIRC", name = "CraftIRC", version = SpongeIRC.MAGIC_VERSION)
@@ -51,7 +52,7 @@ public class SpongeIRC {
     private Logger logger;
 
     @Subscribe
-    public void init(InitializationEvent event) {
+    public void init(@Nonnull InitializationEvent event) {
         try {
             this.craftIRC = new CraftIRC(new Log4JWrapper(this.logger), this.configDir);
         } catch (CraftIRCUnableToStartException e) {
@@ -64,10 +65,12 @@ public class SpongeIRC {
         this.craftIRC.getEndpointManager().registerType(MinecraftEndpoint.class);
     }
 
+    @Nonnull
     CraftIRC getCraftIRC() {
         return this.craftIRC;
     }
 
+    @Nonnull
     Game getGame() {
         return this.game;
     }

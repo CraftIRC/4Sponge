@@ -31,6 +31,7 @@ import org.kitteh.craftirc.util.loadable.Load;
 import org.kitteh.craftirc.util.loadable.Loadable;
 import org.spongepowered.api.entity.player.Player;
 
+import javax.annotation.Nonnull;
 import java.util.Iterator;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public final class PermissionFilter extends Filter {
     private String permission;
     private final SpongeIRC plugin;
 
-    public PermissionFilter(SpongeIRC plugin) {
+    public PermissionFilter(@Nonnull SpongeIRC plugin) {
         this.plugin = plugin;
     }
 
@@ -52,12 +53,13 @@ public final class PermissionFilter extends Filter {
      *
      * @return the permission node monitored
      */
+    @Nonnull
     public String getPermission() {
         return this.permission;
     }
 
     @Override
-    public void processMessage(TargetedMessage message) {
+    public void processMessage(@Nonnull TargetedMessage message) {
         if (message.getCustomData().containsKey(MinecraftEndpoint.RECIPIENT_NAMES)) {
             @SuppressWarnings("unchecked")
             List<MinecraftPlayer> players = (List<MinecraftPlayer>) message.getCustomData().get(MinecraftEndpoint.RECIPIENT_NAMES);
