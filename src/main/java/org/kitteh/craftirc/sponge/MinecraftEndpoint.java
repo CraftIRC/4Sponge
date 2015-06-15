@@ -34,6 +34,7 @@ import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.entity.player.PlayerChatEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.util.TextMessageException;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -73,7 +74,11 @@ public class MinecraftEndpoint extends Endpoint {
         for (MinecraftPlayer recipient : recipients) {
             Optional<Player> player = this.plugin.getGame().getServer().getPlayer(recipient.getName());
             if (player.isPresent()) {
-                player.get().sendMessage(Texts.of(message.getCustomMessage()));
+                try {
+                    player.get().sendMessage(Texts.legacy().from(message.getCustomMessage()));
+                } catch (TextMessageException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
