@@ -90,9 +90,8 @@ public class MinecraftEndpoint extends Endpoint {
         if (text instanceof Text.Translatable) {
             Text.Translatable trans = (Text.Translatable) text;
             List<Object> args = trans.getArguments();
-            if (args.size() == 2 && args.get(0) instanceof Text && args.get(1) instanceof Text) {
-                String message = Texts.toPlain((Text) args.get(1));
-                String sender = Texts.toPlain((Text) args.get(0));
+            String message, sender;
+            if (args.size() == 2 && (sender = this.getString(args.get(0))) != null && (message = this.getString(args.get(1))) != null) {
                 String format = trans.getTranslation().get(Locale.ENGLISH);
                 data.put(Endpoint.MESSAGE_FORMAT, format);
                 data.put(Endpoint.MESSAGE_TEXT, message);
@@ -102,6 +101,16 @@ public class MinecraftEndpoint extends Endpoint {
                 this.plugin.getCraftIRC().getEndpointManager().sendMessage(new Message(this, String.format(format, sender, message), data));
             }
         }
+    }
+
+    private String getString(Object o) {
+        if (o instanceof String) {
+            return (String) o;
+        }
+        if (o instanceof Text) {
+            return Texts.toPlain((Text) o);
+        }
+        return null;
     }
 
     @Nonnull
