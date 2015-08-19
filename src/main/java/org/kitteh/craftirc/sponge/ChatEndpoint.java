@@ -50,13 +50,13 @@ import java.util.stream.Collectors;
  * The standard {@link org.kitteh.craftirc.endpoint.Endpoint} for minecraft
  * chat messages.
  */
-@Loadable.Type(name = "minecraft")
-public class MinecraftEndpoint extends Endpoint {
+@Loadable.Type(name = "mc-chat")
+public class ChatEndpoint extends Endpoint {
     public static final String RECIPIENT_NAMES = "RECIPIENT_NAMES";
 
     private final SpongeIRC plugin;
 
-    public MinecraftEndpoint(@Nonnull SpongeIRC plugin) {
+    public ChatEndpoint(@Nonnull SpongeIRC plugin) {
         this.plugin = plugin;
         this.plugin.getGame().getEventManager().register(plugin, this);
     }
@@ -64,13 +64,13 @@ public class MinecraftEndpoint extends Endpoint {
     @Override
     protected void preProcessReceivedMessage(@Nonnull TargetedMessage message) {
         Set<MinecraftPlayer> players = this.playerCollectionToMinecraftPlayer(this.plugin.getGame().getServer().getOnlinePlayers());
-        message.getCustomData().put(MinecraftEndpoint.RECIPIENT_NAMES, players);
+        message.getCustomData().put(ChatEndpoint.RECIPIENT_NAMES, players);
     }
 
     @Override
     protected void receiveMessage(@Nonnull TargetedMessage message) {
         @SuppressWarnings("unchecked")
-        Set<MinecraftPlayer> recipients = (Set<MinecraftPlayer>) message.getCustomData().get(MinecraftEndpoint.RECIPIENT_NAMES);
+        Set<MinecraftPlayer> recipients = (Set<MinecraftPlayer>) message.getCustomData().get(ChatEndpoint.RECIPIENT_NAMES);
         for (MinecraftPlayer recipient : recipients) {
             Optional<Player> player = this.plugin.getGame().getServer().getPlayer(recipient.getName());
             if (player.isPresent()) {
@@ -96,7 +96,7 @@ public class MinecraftEndpoint extends Endpoint {
                 data.put(Endpoint.MESSAGE_FORMAT, format);
                 data.put(Endpoint.MESSAGE_TEXT, message);
                 Set<MinecraftPlayer> recipients = this.playerCollectionToMinecraftPlayer(this.plugin.getGame().getServer().getOnlinePlayers()); // TODO Collect recipients per event here.
-                data.put(MinecraftEndpoint.RECIPIENT_NAMES, recipients);
+                data.put(ChatEndpoint.RECIPIENT_NAMES, recipients);
                 data.put(Endpoint.SENDER_NAME, sender);
                 this.plugin.getCraftIRC().getEndpointManager().sendMessage(new Message(this, String.format(format, sender, message), data));
             }

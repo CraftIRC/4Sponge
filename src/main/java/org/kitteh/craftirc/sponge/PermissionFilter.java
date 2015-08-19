@@ -60,9 +60,9 @@ public final class PermissionFilter extends Filter {
 
     @Override
     public void processMessage(@Nonnull TargetedMessage message) {
-        if (message.getCustomData().containsKey(MinecraftEndpoint.RECIPIENT_NAMES)) {
+        if (message.getCustomData().containsKey(ChatEndpoint.RECIPIENT_NAMES)) {
             @SuppressWarnings("unchecked")
-            List<MinecraftPlayer> players = (List<MinecraftPlayer>) message.getCustomData().get(MinecraftEndpoint.RECIPIENT_NAMES);
+            List<MinecraftPlayer> players = (List<MinecraftPlayer>) message.getCustomData().get(ChatEndpoint.RECIPIENT_NAMES);
             Iterator<MinecraftPlayer> iterator = players.iterator();
             while (iterator.hasNext()) {
                 MinecraftPlayer minecraftPlayer = iterator.next();

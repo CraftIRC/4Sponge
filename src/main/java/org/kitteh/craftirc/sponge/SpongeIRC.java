@@ -62,7 +62,7 @@ public class SpongeIRC {
         this.craftIRC.getFilterManager().registerArgumentProvider(SpongeIRC.class, () -> SpongeIRC.this);
         this.craftIRC.getFilterManager().registerType(PermissionFilter.class);
         this.craftIRC.getEndpointManager().registerArgumentProvider(SpongeIRC.class, () -> SpongeIRC.this);
-        this.craftIRC.getEndpointManager().registerType(MinecraftEndpoint.class);
+        this.craftIRC.getEndpointManager().registerType(ChatEndpoint.class);
     }
 
     @Nonnull
