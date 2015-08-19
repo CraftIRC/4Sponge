@@ -37,34 +37,19 @@ import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.TextMessageException;
 
 import javax.annotation.Nonnull;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
- * The standard {@link org.kitteh.craftirc.endpoint.Endpoint} for minecraft
- * chat messages.
+ * The standard {@link Endpoint} for minecraft chat messages.
  */
 @Loadable.Type(name = "mc-chat")
-public class ChatEndpoint extends Endpoint {
-    public static final String RECIPIENT_NAMES = "RECIPIENT_NAMES";
-
-    private final SpongeIRC plugin;
-
+public class ChatEndpoint extends MinecraftEndpoint {
     public ChatEndpoint(@Nonnull SpongeIRC plugin) {
-        this.plugin = plugin;
-        this.plugin.getGame().getEventManager().register(plugin, this);
-    }
-
-    @Override
-    protected void preProcessReceivedMessage(@Nonnull TargetedMessage message) {
-        Set<MinecraftPlayer> players = this.playerCollectionToMinecraftPlayer(this.plugin.getGame().getServer().getOnlinePlayers());
-        message.getCustomData().put(ChatEndpoint.RECIPIENT_NAMES, players);
+        super(plugin);
     }
 
     @Override
@@ -72,7 +57,7 @@ public class ChatEndpoint extends Endpoint {
         @SuppressWarnings("unchecked")
         Set<MinecraftPlayer> recipients = (Set<MinecraftPlayer>) message.getCustomData().get(ChatEndpoint.RECIPIENT_NAMES);
         for (MinecraftPlayer recipient : recipients) {
-            Optional<Player> player = this.plugin.getGame().getServer().getPlayer(recipient.getName());
+            Optional<Player> player = this.getPlugin().getGame().getServer().getPlayer(recipient.getName());
             if (player.isPresent()) {
                 try {
                     player.get().sendMessage(Texts.legacy().from(message.getCustomMessage()));
@@ -91,30 +76,15 @@ public class ChatEndpoint extends Endpoint {
             Text.Translatable trans = (Text.Translatable) text;
             List<Object> args = trans.getArguments();
             String message, sender;
-            if (args.size() == 2 && (sender = this.getString(args.get(0))) != null && (message = this.getString(args.get(1))) != null) {
+            if (args.size() == 2 && (sender = this.getStringFromStringOrText(args.get(0))) != null && (message = this.getStringFromStringOrText(args.get(1))) != null) {
                 String format = trans.getTranslation().get(Locale.ENGLISH);
                 data.put(Endpoint.MESSAGE_FORMAT, format);
                 data.put(Endpoint.MESSAGE_TEXT, message);
-                Set<MinecraftPlayer> recipients = this.playerCollectionToMinecraftPlayer(this.plugin.getGame().getServer().getOnlinePlayers()); // TODO Collect recipients per event here.
+                Set<MinecraftPlayer> recipients = this.playerCollectionToMinecraftPlayer(this.getPlugin().getGame().getServer().getOnlinePlayers()); // TODO Collect recipients per event here.
                 data.put(ChatEndpoint.RECIPIENT_NAMES, recipients);
                 data.put(Endpoint.SENDER_NAME, sender);
-                this.plugin.getCraftIRC().getEndpointManager().sendMessage(new Message(this, String.format(format, sender, message), data));
+                this.getPlugin().getCraftIRC().getEndpointManager().sendMessage(new Message(this, String.format(format, sender, message), data));
             }
         }
-    }
-
-    private String getString(Object o) {
-        if (o instanceof String) {
-            return (String) o;
-        }
-        if (o instanceof Text) {
-            return Texts.toPlain((Text) o);
-        }
-        return null;
-    }
-
-    @Nonnull
-    private Set<MinecraftPlayer> playerCollectionToMinecraftPlayer(@Nonnull Collection<Player> collection) {
-        return collection.stream().map(player -> new MinecraftPlayer(player.getName(), player.getUniqueId())).collect(Collectors.toCollection(HashSet::new));
     }
 }
