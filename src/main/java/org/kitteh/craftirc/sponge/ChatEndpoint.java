@@ -69,7 +69,7 @@ public class ChatEndpoint extends MinecraftEndpoint {
     }
 
     @Listener
-    public void onChat(@Nonnull MessageSinkEvent event) {
+    public void onChat(@Nonnull MessageSinkEvent.Chat event) {
         if (!event.getCause().first(Player.class).isPresent()) {
             return; // Not a player chatting
         }
