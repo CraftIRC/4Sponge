@@ -29,10 +29,10 @@ import org.kitteh.craftirc.exceptions.CraftIRCUnableToStartException;
 import org.kitteh.craftirc.sponge.util.Log4JWrapper;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.event.state.InitializationEvent;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.service.config.ConfigDir;
-import org.spongepowered.api.event.Subscribe;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -51,8 +51,8 @@ public class SpongeIRC {
     @Inject
     private Logger logger;
 
-    @Subscribe
-    public void init(@Nonnull InitializationEvent event) {
+    @Listener
+    public void init(@Nonnull GameInitializationEvent event) {
         try {
             this.craftIRC = new CraftIRC(new Log4JWrapper(this.logger), this.configDir);
         } catch (CraftIRCUnableToStartException e) {

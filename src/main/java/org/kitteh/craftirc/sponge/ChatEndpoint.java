@@ -29,9 +29,9 @@ import org.kitteh.craftirc.endpoint.Message;
 import org.kitteh.craftirc.endpoint.TargetedMessage;
 import org.kitteh.craftirc.util.MinecraftPlayer;
 import org.kitteh.craftirc.util.loadable.Loadable;
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.entity.player.PlayerChatEvent;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.command.MessageSinkEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.TextMessageException;
@@ -68,8 +68,11 @@ public class ChatEndpoint extends MinecraftEndpoint {
         }
     }
 
-    @Subscribe
-    public void onChat(@Nonnull PlayerChatEvent event) {
+    @Listener
+    public void onChat(@Nonnull MessageSinkEvent event) {
+        if (!event.getCause().first(Player.class).isPresent()) {
+            return; // Not a player chatting
+        }
         Map<String, Object> data = new HashMap<>();
         Text text = event.getMessage();
         if (text instanceof Text.Translatable) {

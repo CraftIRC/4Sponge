@@ -6,7 +6,7 @@
     <artifactId>craftirc-sponge</artifactId>
 
     <name>CraftIRC Sponge</name>
-    <version>4.0.1-SNAPSHOT</version>
+    <version>4.0.2-SNAPSHOT</version>
 
     <url>http://kitteh.org/</url>
     <properties>
@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.kitteh</groupId>
             <artifactId>craftirc</artifactId>
-            <version>4.0.1</version>
+            <version>4.0.2-SNAPSHOT</version>
             <type>jar</type>
             <optional>true</optional>
             <scope>compile</scope>

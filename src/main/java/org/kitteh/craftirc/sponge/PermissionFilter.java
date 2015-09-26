@@ -29,7 +29,7 @@ import org.kitteh.craftirc.endpoint.filter.Filter;
 import org.kitteh.craftirc.util.MinecraftPlayer;
 import org.kitteh.craftirc.util.loadable.Load;
 import org.kitteh.craftirc.util.loadable.Loadable;
-import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.entity.living.player.Player;
 
 import javax.annotation.Nonnull;
 import java.util.Iterator;
