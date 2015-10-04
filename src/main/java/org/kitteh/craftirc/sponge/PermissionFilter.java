@@ -23,7 +23,6 @@
  */
 package org.kitteh.craftirc.sponge;
 
-import com.google.common.base.Optional;
 import org.kitteh.craftirc.endpoint.TargetedMessage;
 import org.kitteh.craftirc.endpoint.filter.Filter;
 import org.kitteh.craftirc.util.MinecraftPlayer;
@@ -34,6 +33,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import javax.annotation.Nonnull;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * A filter by permission node.
