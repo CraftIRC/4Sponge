@@ -32,6 +32,7 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.event.game.state.GameStoppingEvent;
 import org.spongepowered.api.plugin.Plugin;
 
 import javax.annotation.Nonnull;
@@ -65,6 +66,13 @@ public class SpongeIRC {
         this.craftIRC.getEndpointManager().registerType(ChatEndpoint.class);
         this.craftIRC.getEndpointManager().registerType(JoinEndpoint.class);
         this.craftIRC.getEndpointManager().registerType(QuitEndpoint.class);
+    }
+
+    @Listener
+    public void stahp(@Nonnull GameStoppingEvent event) {
+        if (this.craftIRC != null) {
+            this.craftIRC.shutdown();
+        }
     }
 
     @Nonnull
