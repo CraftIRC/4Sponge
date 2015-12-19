@@ -29,10 +29,10 @@ import org.kitteh.craftirc.exceptions.CraftIRCUnableToStartException;
 import org.kitteh.craftirc.sponge.util.Log4JWrapper;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.service.config.ConfigDir;
 
 import javax.annotation.Nonnull;
 import java.io.File;
