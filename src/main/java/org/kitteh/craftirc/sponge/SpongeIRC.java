@@ -84,6 +84,4 @@ public class SpongeIRC {
     Game getGame() {
         return this.game;
     }
-
-    // TODO shutdown - https://github.com/SpongePowered/SpongeAPI/issues/442
 }
