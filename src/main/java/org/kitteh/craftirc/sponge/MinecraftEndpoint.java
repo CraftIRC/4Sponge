@@ -26,6 +26,7 @@ package org.kitteh.craftirc.sponge;
 import org.kitteh.craftirc.endpoint.Endpoint;
 import org.kitteh.craftirc.endpoint.TargetedMessage;
 import org.kitteh.craftirc.util.MinecraftPlayer;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
@@ -57,7 +58,7 @@ public abstract class MinecraftEndpoint extends Endpoint {
 
     @Override
     protected void preProcessReceivedMessage(@Nonnull TargetedMessage message) {
-        Set<MinecraftPlayer> players = this.playerCollectionToMinecraftPlayer(this.plugin.getGame().getServer().getOnlinePlayers());
+        Set<MinecraftPlayer> players = this.commandSourceCollectionToMinecraftPlayer(this.plugin.getGame().getServer().getOnlinePlayers());
         message.getCustomData().put(MinecraftEndpoint.RECIPIENT_NAMES, players);
     }
 
@@ -73,7 +74,18 @@ public abstract class MinecraftEndpoint extends Endpoint {
     }
 
     @Nonnull
-    protected Set<MinecraftPlayer> playerCollectionToMinecraftPlayer(@Nonnull Collection<Player> collection) {
-        return collection.stream().map(player -> new MinecraftPlayer(player.getName(), player.getUniqueId())).collect(Collectors.toCollection(HashSet::new));
+    protected Set<MinecraftPlayer> commandSourceCollectionToMinecraftPlayer(@Nonnull Collection<? extends CommandSource> collection) {
+        return collection.stream().filter(source -> source instanceof Player).map(player -> new MinecraftPlayer(player.getName(), ((Player) player).getUniqueId())).collect(Collectors.toCollection(HashSet::new));
+    }
+
+    @Nonnull
+    protected Set<MinecraftPlayer> commandSourceIterableToMinecraftPlayer(@Nonnull Iterable<? extends CommandSource> iterable) {
+        Set<MinecraftPlayer> set = new HashSet<>();
+        iterable.forEach(source -> {
+            if (source instanceof Player) {
+                set.add(new MinecraftPlayer(source.getName(), ((Player) source).getUniqueId()));
+            }
+        });
+        return set;
     }
 }

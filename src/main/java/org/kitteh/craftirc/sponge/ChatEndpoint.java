@@ -83,7 +83,7 @@ public class ChatEndpoint extends MinecraftEndpoint {
                 String format = trans.getTranslation().get(Locale.ENGLISH);
                 data.put(Endpoint.MESSAGE_FORMAT, format);
                 data.put(Endpoint.MESSAGE_TEXT, message);
-                Set<MinecraftPlayer> recipients = this.playerCollectionToMinecraftPlayer(this.getPlugin().getGame().getServer().getOnlinePlayers()); // TODO Collect recipients per event here.
+                Set<MinecraftPlayer> recipients = this.commandSourceIterableToMinecraftPlayer(event.getSink().getRecipients());
                 data.put(ChatEndpoint.RECIPIENT_NAMES, recipients);
                 data.put(Endpoint.SENDER_NAME, sender);
                 this.getPlugin().getCraftIRC().getEndpointManager().sendMessage(new Message(this, String.format(format, sender, message), data));

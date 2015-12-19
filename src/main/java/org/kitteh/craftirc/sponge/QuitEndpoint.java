@@ -53,7 +53,7 @@ public class QuitEndpoint extends MinecraftEndpoint {
     @Listener
     public void onChat(@Nonnull ClientConnectionEvent.Disconnect event) {
         Map<String, Object> data = new HashMap<>();
-        Set<MinecraftPlayer> recipients = this.playerCollectionToMinecraftPlayer(this.getPlugin().getGame().getServer().getOnlinePlayers()); // TODO Collect recipients per event here.
+        Set<MinecraftPlayer> recipients = this.commandSourceIterableToMinecraftPlayer(event.getSink().getRecipients());
         data.put(QuitEndpoint.RECIPIENT_NAMES, recipients);
         this.getPlugin().getCraftIRC().getEndpointManager().sendMessage(new Message(this, event.getTargetEntity().getName() + " left the game", data));
     }

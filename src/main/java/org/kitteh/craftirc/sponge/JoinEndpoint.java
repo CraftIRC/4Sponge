@@ -53,7 +53,7 @@ public class JoinEndpoint extends MinecraftEndpoint {
     @Listener
     public void onChat(@Nonnull ClientConnectionEvent.Join event) {
         Map<String, Object> data = new HashMap<>();
-        Set<MinecraftPlayer> recipients = this.playerCollectionToMinecraftPlayer(this.getPlugin().getGame().getServer().getOnlinePlayers()); // TODO Collect recipients per event here.
+        Set<MinecraftPlayer> recipients = this.commandSourceIterableToMinecraftPlayer(event.getSink().getRecipients());
         data.put(JoinEndpoint.RECIPIENT_NAMES, recipients);
         this.getPlugin().getCraftIRC().getEndpointManager().sendMessage(new Message(this, event.getTargetEntity().getName() + " joined the game", data));
     }
