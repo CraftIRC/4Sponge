@@ -30,10 +30,10 @@ import org.kitteh.craftirc.util.MinecraftPlayer;
 import org.kitteh.craftirc.util.loadable.Loadable;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.command.MessageSinkEvent;
+import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.TextMessageException;
+import org.spongepowered.api.text.TranslatableText;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -59,31 +59,27 @@ public class ChatEndpoint extends MinecraftEndpoint {
         for (MinecraftPlayer recipient : recipients) {
             Optional<Player> player = this.getPlugin().getGame().getServer().getPlayer(recipient.getName());
             if (player.isPresent()) {
-                try {
-                    player.get().sendMessage(Texts.legacy().from(message.getCustomMessage()));
-                } catch (TextMessageException e) {
-                    e.printStackTrace();
-                }
+                player.get().sendMessage(TextSerializers.LEGACY_FORMATTING_CODE.deserialize(message.getCustomMessage()));
             }
         }
     }
 
     @Listener
-    public void onChat(@Nonnull MessageSinkEvent.Chat event) {
-        if (!event.getCause().first(Player.class).isPresent()) {
+    public void onChat(@Nonnull MessageChannelEvent.Chat event) {
+        if (!event.getMessage().isPresent() || !event.getChannel().isPresent() || !event.getCause().first(Player.class).isPresent()) {
             return; // Not a player chatting
         }
         Map<String, Object> data = new HashMap<>();
-        Text text = event.getMessage();
-        if (text instanceof Text.Translatable) {
-            Text.Translatable trans = (Text.Translatable) text;
+        Text text = event.getMessage().get();
+        if (text instanceof TranslatableText) {
+            TranslatableText trans = (TranslatableText) text;
             List<Object> args = trans.getArguments();
             String message, sender;
             if (args.size() == 2 && (sender = this.getStringFromStringOrText(args.get(0))) != null && (message = this.getStringFromStringOrText(args.get(1))) != null) {
                 String format = trans.getTranslation().get(Locale.ENGLISH);
                 data.put(Endpoint.MESSAGE_FORMAT, format);
                 data.put(Endpoint.MESSAGE_TEXT, message);
-                Set<MinecraftPlayer> recipients = this.commandSourceIterableToMinecraftPlayer(event.getSink().getRecipients());
+                Set<MinecraftPlayer> recipients = this.collectionToMinecraftPlayer(event.getChannel().get().getMembers());
                 data.put(ChatEndpoint.RECIPIENT_NAMES, recipients);
                 data.put(Endpoint.SENDER_NAME, sender);
                 this.getPlugin().getCraftIRC().getEndpointManager().sendMessage(new Message(this, String.format(format, sender, message), data));

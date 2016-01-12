@@ -29,7 +29,8 @@ import org.kitteh.craftirc.util.MinecraftPlayer;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.channel.MessageReceiver;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -58,7 +59,7 @@ public abstract class MinecraftEndpoint extends Endpoint {
 
     @Override
     protected void preProcessReceivedMessage(@Nonnull TargetedMessage message) {
-        Set<MinecraftPlayer> players = this.commandSourceCollectionToMinecraftPlayer(this.plugin.getGame().getServer().getOnlinePlayers());
+        Set<MinecraftPlayer> players = this.collectionToMinecraftPlayer(this.plugin.getGame().getServer().getOnlinePlayers());
         message.getCustomData().put(MinecraftEndpoint.RECIPIENT_NAMES, players);
     }
 
@@ -68,14 +69,14 @@ public abstract class MinecraftEndpoint extends Endpoint {
             return (String) o;
         }
         if (o instanceof Text) {
-            return Texts.toPlain((Text) o);
+            return TextSerializers.PLAIN.serialize((Text) o);
         }
         return null;
     }
 
     @Nonnull
-    protected Set<MinecraftPlayer> commandSourceCollectionToMinecraftPlayer(@Nonnull Collection<? extends CommandSource> collection) {
-        return collection.stream().filter(source -> source instanceof Player).map(player -> new MinecraftPlayer(player.getName(), ((Player) player).getUniqueId())).collect(Collectors.toCollection(HashSet::new));
+    protected Set<MinecraftPlayer> collectionToMinecraftPlayer(@Nonnull Collection<? extends MessageReceiver> collection) {
+        return collection.stream().filter(source -> source instanceof Player).map(player -> new MinecraftPlayer(((Player) player).getName(), ((Player) player).getUniqueId())).collect(Collectors.toCollection(HashSet::new));
     }
 
     @Nonnull
