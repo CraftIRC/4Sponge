@@ -25,19 +25,27 @@ package org.kitteh.craftirc.sponge;
 
 import com.google.inject.Inject;
 import org.kitteh.craftirc.CraftIRC;
+import org.kitteh.craftirc.endpoint.Endpoint;
 import org.kitteh.craftirc.exceptions.CraftIRCUnableToStartException;
 import org.kitteh.craftirc.sponge.util.Log4JWrapper;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingEvent;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 @Plugin(id = "CraftIRC", name = "CraftIRC", version = SpongeIRC.MAGIC_VERSION)
 public class SpongeIRC {
@@ -52,10 +60,45 @@ public class SpongeIRC {
     private Game game;
     @Inject
     private Logger logger;
+    private Set<Endpoint> registeredEndpoints = new CopyOnWriteArraySet<>();
+    private boolean reloading = false;
 
     @Listener
     public void init(@Nonnull GameInitializationEvent event) {
         this.startMeUp();
+    }
+
+    @Listener
+    public void starting(@Nonnull GameStartingServerEvent event) {
+        CommandSpec reloadSpec = CommandSpec.builder()
+                .executor((commandSource, commandContext) -> {
+                    if (this.reloading) {
+                        commandSource.sendMessage(Text.of(TextColors.RED, "CraftIRC reload already in progress"));
+                    } else {
+                        this.reloading = true;
+                        commandSource.sendMessage(Text.of(TextColors.AQUA, "CraftIRC reload scheduled"));
+                        this.game.getScheduler().createTaskBuilder()
+                                .async()
+                                .execute(() -> {
+                                    this.dontMakeAGrownManCry();
+                                    this.startMeUp();
+                                    this.reloading = false;
+                                })
+                                .name("CraftIRC Reloading...")
+                                .submit(this);
+                    }
+                    return CommandResult.success();
+                })
+                .permission("craftirc.reload")
+                .build();
+        CommandSpec mainSpec = CommandSpec.builder()
+                .child(reloadSpec, "reload")
+                .executor((commandSource, commandContext) -> {
+                    commandSource.sendMessage(Text.of(TextColors.AQUA, "CraftIRC version ", TextColors.WHITE, SpongeIRC.class.getAnnotation(Plugin.class).version(), TextColors.AQUA, " - Powered by Kittens"));
+                    return CommandResult.success();
+                })
+                .build();
+        this.game.getCommandManager().register(this, mainSpec, "craftirc");
     }
 
     @Listener
@@ -73,7 +116,12 @@ public class SpongeIRC {
         return this.game;
     }
 
-    private void startMeUp() {
+    void registerEndpoint(Endpoint endpoint) {
+        this.registeredEndpoints.add(endpoint);
+        this.game.getEventManager().registerListeners(this, endpoint);
+    }
+
+    private synchronized void startMeUp() {
         try {
             this.craftIRC = new CraftIRC(new Log4JWrapper(this.logger), this.configDir);
         } catch (CraftIRCUnableToStartException e) {
@@ -88,7 +136,9 @@ public class SpongeIRC {
         this.craftIRC.getEndpointManager().registerType(QuitEndpoint.class);
     }
 
-    private void dontMakeAGrownManCry() {
+    private synchronized void dontMakeAGrownManCry() {
+        this.registeredEndpoints.forEach(endpoint -> this.game.getEventManager().unregisterListeners(endpoint));
+        this.registeredEndpoints.clear();
         if (this.craftIRC != null) {
             this.craftIRC.shutdown();
         }

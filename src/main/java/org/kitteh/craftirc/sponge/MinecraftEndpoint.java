@@ -49,7 +49,7 @@ public abstract class MinecraftEndpoint extends Endpoint {
 
     public MinecraftEndpoint(@Nonnull SpongeIRC plugin) {
         this.plugin = plugin;
-        this.plugin.getGame().getEventManager().registerListeners(plugin, this);
+        this.plugin.registerEndpoint(this);
     }
 
     @Nonnull
