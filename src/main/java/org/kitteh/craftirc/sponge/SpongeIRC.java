@@ -37,6 +37,7 @@ import org.spongepowered.api.plugin.Plugin;
 
 import javax.annotation.Nonnull;
 import java.io.File;
+import java.util.Optional;
 
 @Plugin(id = "CraftIRC", name = "CraftIRC", version = SpongeIRC.MAGIC_VERSION)
 public class SpongeIRC {
@@ -54,6 +55,25 @@ public class SpongeIRC {
 
     @Listener
     public void init(@Nonnull GameInitializationEvent event) {
+        this.startMeUp();
+    }
+
+    @Listener
+    public void stahp(@Nonnull GameStoppingEvent event) {
+        this.dontMakeAGrownManCry();
+    }
+
+    @Nonnull
+    Optional<CraftIRC> getCraftIRC() {
+        return Optional.ofNullable(this.craftIRC);
+    }
+
+    @Nonnull
+    Game getGame() {
+        return this.game;
+    }
+
+    private void startMeUp() {
         try {
             this.craftIRC = new CraftIRC(new Log4JWrapper(this.logger), this.configDir);
         } catch (CraftIRCUnableToStartException e) {
@@ -68,20 +88,9 @@ public class SpongeIRC {
         this.craftIRC.getEndpointManager().registerType(QuitEndpoint.class);
     }
 
-    @Listener
-    public void stahp(@Nonnull GameStoppingEvent event) {
+    private void dontMakeAGrownManCry() {
         if (this.craftIRC != null) {
             this.craftIRC.shutdown();
         }
-    }
-
-    @Nonnull
-    CraftIRC getCraftIRC() {
-        return this.craftIRC;
-    }
-
-    @Nonnull
-    Game getGame() {
-        return this.game;
     }
 }

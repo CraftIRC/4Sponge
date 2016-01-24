@@ -58,6 +58,6 @@ public class JoinEndpoint extends MinecraftEndpoint {
         Map<String, Object> data = new HashMap<>();
         Set<MinecraftPlayer> recipients = this.collectionToMinecraftPlayer(event.getChannel().get().getMembers());
         data.put(JoinEndpoint.RECIPIENT_NAMES, recipients);
-        this.getPlugin().getCraftIRC().getEndpointManager().sendMessage(new Message(this, event.getTargetEntity().getName() + " joined the game", data));
+        this.getPlugin().getCraftIRC().ifPresent(craftIRC -> craftIRC.getEndpointManager().sendMessage(new Message(this, event.getTargetEntity().getName() + " joined the game", data)));
     }
 }
