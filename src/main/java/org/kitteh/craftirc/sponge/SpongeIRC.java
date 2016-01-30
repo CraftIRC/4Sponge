@@ -103,7 +103,7 @@ public class SpongeIRC {
                     }
                     return CommandResult.success();
                 })
-                .permission("craftirc.reload")
+                .permission(PERMISSION_RELOAD)
                 .build();
         CommandSpec mainSpec = CommandSpec.builder()
                 .child(reloadSpec, "reload")
