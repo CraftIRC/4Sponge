@@ -70,7 +70,7 @@ public class ChatEndpoint extends MinecraftEndpoint {
             return; // Not a player chatting
         }
         Map<String, Object> data = new HashMap<>();
-        Text text = event.getMessage().get();
+        Text text = event.getOriginalMessage().get();
         if (text instanceof TranslatableText) {
             TranslatableText trans = (TranslatableText) text;
             List<Object> args = trans.getArguments();
