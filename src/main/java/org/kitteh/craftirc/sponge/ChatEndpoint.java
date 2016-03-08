@@ -66,11 +66,11 @@ public class ChatEndpoint extends MinecraftEndpoint {
 
     @Listener
     public void onChat(@Nonnull MessageChannelEvent.Chat event) {
-        if (!event.getMessage().isPresent() || !event.getChannel().isPresent() || !event.getCause().first(Player.class).isPresent()) {
+        if (!event.getChannel().isPresent() || !event.getCause().first(Player.class).isPresent()) {
             return; // Not a player chatting
         }
         Map<String, Object> data = new HashMap<>();
-        Text text = event.getOriginalMessage().get();
+        Text text = event.getOriginalMessage();
         if (text instanceof TranslatableText) {
             TranslatableText trans = (TranslatableText) text;
             List<Object> args = trans.getArguments();
