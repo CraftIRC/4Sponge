@@ -28,6 +28,7 @@ import org.kitteh.craftirc.endpoint.Message;
 import org.kitteh.craftirc.endpoint.TargetedMessage;
 import org.kitteh.craftirc.util.MinecraftPlayer;
 import org.kitteh.craftirc.util.loadable.Loadable;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 
@@ -57,6 +58,7 @@ public class JoinEndpoint extends MinecraftEndpoint {
         }
         Map<String, Object> data = new HashMap<>();
         Set<MinecraftPlayer> recipients = this.collectionToMinecraftPlayer(event.getChannel().get().getMembers());
+        data.put(JoinEndpoint.SENDER_NAME, event.getCause().first(Player.class).get().getName());
         data.put(JoinEndpoint.RECIPIENT_NAMES, recipients);
         this.getPlugin().getCraftIRC().ifPresent(craftIRC -> craftIRC.getEndpointManager().sendMessage(new Message(this, event.getTargetEntity().getName() + " joined the game", data)));
     }
