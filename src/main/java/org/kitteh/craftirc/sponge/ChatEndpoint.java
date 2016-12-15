@@ -31,11 +31,13 @@ import org.kitteh.craftirc.util.loadable.Loadable;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.message.MessageChannelEvent;
+import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TranslatableText;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -71,6 +73,8 @@ public class ChatEndpoint extends MinecraftEndpoint {
         }
         Map<String, Object> data = new HashMap<>();
         Text text = event.getOriginalMessage();
+        Set<MinecraftPlayer> recipients = this.collectionToMinecraftPlayer(event.getChannel().get().getMembers());
+        data.put(ChatEndpoint.RECIPIENT_NAMES, recipients);
         if (text instanceof TranslatableText) {
             TranslatableText trans = (TranslatableText) text;
             List<Object> args = trans.getArguments();
@@ -79,10 +83,28 @@ public class ChatEndpoint extends MinecraftEndpoint {
                 String format = trans.getTranslation().get(Locale.ENGLISH);
                 data.put(Endpoint.MESSAGE_FORMAT, format);
                 data.put(Endpoint.MESSAGE_TEXT, message);
-                Set<MinecraftPlayer> recipients = this.collectionToMinecraftPlayer(event.getChannel().get().getMembers());
-                data.put(ChatEndpoint.RECIPIENT_NAMES, recipients);
                 data.put(Endpoint.SENDER_NAME, sender);
                 this.getPlugin().getCraftIRC().ifPresent(craftIRC -> craftIRC.getEndpointManager().sendMessage(new Message(this, String.format(format, sender, message), data)));
+            }
+        } else if (text instanceof LiteralText) {
+            LiteralText literalText = (LiteralText) text;
+            //literalText.withChildren().forEach(ch -> CraftIRC.log().info(ch.toString()));
+            List<Text> texts = new ArrayList<>();
+            literalText.withChildren().forEach(t -> {
+                if (t.getChildren().isEmpty()) {
+                    texts.add(t);
+                }
+            });
+            if (texts.size() == 3) {
+                Text one = texts.get(0);
+                Text three = texts.get(2);
+                if (one instanceof LiteralText && three instanceof LiteralText) {
+                    String message = ((LiteralText) three).getContent();
+                    data.put(Endpoint.MESSAGE_TEXT, message);
+                    String sender = ((LiteralText) one).getContent();
+                    data.put(Endpoint.SENDER_NAME, sender);
+                    this.getPlugin().getCraftIRC().ifPresent(craftIRC -> craftIRC.getEndpointManager().sendMessage(new Message(this, String.format("<%s> %s", sender, message), data)));
+                }
             }
         }
     }
