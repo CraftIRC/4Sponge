@@ -23,12 +23,10 @@
  */
 package org.kitteh.craftirc.sponge;
 
-import com.google.gson.Gson;
 import com.google.inject.Inject;
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.endpoint.Endpoint;
 import org.kitteh.craftirc.exceptions.CraftIRCUnableToStartException;
-import org.kitteh.craftirc.sponge.util.LatestRelease;
 import org.kitteh.craftirc.sponge.util.Log4JWrapper;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
@@ -39,22 +37,15 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingEvent;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import javax.annotation.Nonnull;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.TimeUnit;
 
 @Plugin(id = "craftirc", name = "CraftIRC", version = SpongeIRC.MAGIC_VERSION)
 public class SpongeIRC {
@@ -62,7 +53,6 @@ public class SpongeIRC {
     static final String MAGIC_VERSION = "SET_BY_MAGIC"; // KEEP THIS VALUE EQUAL TO SET_BY_MAGIC FOR UNIT TEST
 
     private static final String PERMISSION_RELOAD = "craftirc.reload";
-    private static final String PERMISSION_UPDATE_NOTICE = "craftirc.updatenotice";
 
     private CraftIRC craftIRC;
     @Inject
@@ -72,8 +62,6 @@ public class SpongeIRC {
     private Game game;
     @Inject
     private Logger logger;
-    private String newVersion;
-    private Text newVersionText;
     private Set<Endpoint> registeredEndpoints = new CopyOnWriteArraySet<>();
     private boolean reloading = false;
 
@@ -109,56 +97,15 @@ public class SpongeIRC {
                 .child(reloadSpec, "reload")
                 .executor((commandSource, commandContext) -> {
                     commandSource.sendMessage(Text.of(TextColors.AQUA, "CraftIRC version ", TextColors.WHITE, SpongeIRC.class.getAnnotation(Plugin.class).version(), TextColors.AQUA, " - Powered by Kittens"));
-                    if (this.newVersionText != null && commandSource.hasPermission(PERMISSION_UPDATE_NOTICE)) {
-                        commandSource.sendMessage(this.newVersionText);
-                    }
                     return CommandResult.success();
                 })
                 .build();
         this.game.getCommandManager().register(this, mainSpec, "craftirc");
-
-        this.game.getScheduler().createTaskBuilder()
-                .async()
-                .execute(() -> {
-                    StringBuilder response = new StringBuilder();
-                    LatestRelease latestRelease = null;
-                    URL downloadURL = null;
-                    try {
-                        URL url = new URL("https://api.github.com/repos/CraftIRC/4Sponge/releases/latest");
-                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                        conn.setRequestProperty("Accept", "application/vnd.github.v3+json");
-                        try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
-                            String inputLine;
-                            while ((inputLine = in.readLine()) != null) {
-                                response.append(inputLine);
-                            }
-                        }
-                        latestRelease = new Gson().fromJson(response.toString(), LatestRelease.class);
-                        downloadURL = new URL(latestRelease.getURL());
-                    } catch (Exception ignored) {
-                    }
-                    if (latestRelease != null && latestRelease.getTagName() != null && !latestRelease.getTagName().equals(SpongeIRC.class.getAnnotation(Plugin.class).version())) {
-                        this.newVersion = latestRelease.getTagName();
-                        Text versionText = downloadURL == null ? Text.of(TextColors.WHITE, this.newVersion) : Text.builder(this.newVersion).color(TextColors.WHITE).onClick(TextActions.openUrl(downloadURL)).build();
-                        this.newVersionText = Text.builder("New CraftIRC release available: ").color(TextColors.AQUA).append(versionText).build();
-                        this.logger.info("New version available: " + this.newVersion);
-                    }
-                })
-                .name("CraftIRC Update Check")
-                .interval(1, TimeUnit.HOURS)
-                .submit(this);
     }
 
     @Listener
     public void stahp(@Nonnull GameStoppingEvent event) {
         this.dontMakeAGrownManCry();
-    }
-
-    @Listener
-    public void onJoin(@Nonnull ClientConnectionEvent.Join event) {
-        if (this.newVersionText != null && event.getTargetEntity().hasPermission(PERMISSION_UPDATE_NOTICE)) {
-            event.getTargetEntity().sendMessage(this.newVersionText);
-        }
     }
 
     @Nonnull
