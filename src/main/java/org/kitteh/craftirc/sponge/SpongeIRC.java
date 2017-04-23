@@ -47,11 +47,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-@Plugin(id = "craftirc", name = "CraftIRC", version = SpongeIRC.MAGIC_VERSION)
+@Plugin(id = "craftirc", name = "CraftIRC", version = "4.1.5-SNAPSHOT")
 public class SpongeIRC {
-    // Field set by javassist-maven-plugin, confirmed by unit test
-    static final String MAGIC_VERSION = "SET_BY_MAGIC"; // KEEP THIS VALUE EQUAL TO SET_BY_MAGIC FOR UNIT TEST
-
     private static final String PERMISSION_RELOAD = "craftirc.reload";
 
     private CraftIRC craftIRC;

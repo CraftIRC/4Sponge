@@ -75,6 +75,7 @@ public class ChatEndpoint extends MinecraftEndpoint {
         Text text = event.getOriginalMessage();
         Set<MinecraftPlayer> recipients = this.collectionToMinecraftPlayer(event.getChannel().get().getMembers());
         data.put(ChatEndpoint.RECIPIENT_NAMES, recipients);
+        //text.withChildren().forEach(ch -> org.kitteh.craftirc.CraftIRC.log().info(ch.toString()));
         if (text instanceof TranslatableText) {
             TranslatableText trans = (TranslatableText) text;
             List<Object> args = trans.getArguments();
