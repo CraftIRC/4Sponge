@@ -47,7 +47,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-@Plugin(id = "craftirc", name = "CraftIRC", version = "4.1.5-SNAPSHOT", authors = "mbaxter",
+@Plugin(id = "craftirc", name = "CraftIRC", version = "4.1.5", authors = "mbaxter",
         description = "Relay between IRC and Minecraft", url = "http://kitteh.org")
 public class SpongeIRC {
     private static final String PERMISSION_RELOAD = "craftirc.reload";
