@@ -75,7 +75,6 @@ public class ChatEndpoint extends MinecraftEndpoint {
         Text text = event.getOriginalMessage();
         Set<MinecraftPlayer> recipients = this.collectionToMinecraftPlayer(event.getChannel().get().getMembers());
         data.put(ChatEndpoint.RECIPIENT_NAMES, recipients);
-        //text.withChildren().forEach(ch -> org.kitteh.craftirc.CraftIRC.log().info(ch.toString()));
         if (text instanceof TranslatableText) {
             TranslatableText trans = (TranslatableText) text;
             List<Object> args = trans.getArguments();
@@ -89,7 +88,6 @@ public class ChatEndpoint extends MinecraftEndpoint {
             }
         } else if (text instanceof LiteralText) {
             LiteralText literalText = (LiteralText) text;
-            //literalText.withChildren().forEach(ch -> CraftIRC.log().info(ch.toString()));
             List<Text> texts = new ArrayList<>();
             literalText.withChildren().forEach(t -> {
                 if (t.getChildren().isEmpty()) {
@@ -102,7 +100,7 @@ public class ChatEndpoint extends MinecraftEndpoint {
                 if (one instanceof LiteralText && three instanceof LiteralText) {
                     String message = ((LiteralText) three).getContent();
                     data.put(Endpoint.MESSAGE_TEXT, message);
-                    String sender = ((LiteralText) one).getContent();
+                    String sender = TextSerializers.LEGACY_FORMATTING_CODE.serialize(one);
                     data.put(Endpoint.SENDER_NAME, sender);
                     this.getPlugin().getCraftIRC().ifPresent(craftIRC -> craftIRC.getEndpointManager().sendMessage(new Message(this, String.format("<%s> %s", sender, message), data)));
                 }
