@@ -35,8 +35,7 @@ public class Log4JWrapper implements org.kitteh.craftirc.util.Logger {
     private final Logger logger;
 
     public Log4JWrapper(Logger logger) {
-        Sanity.nullCheck(logger, "Logger cannot be null");
-        this.logger = logger;
+        this.logger = Sanity.nullCheck(logger, "Logger cannot be null");
     }
 
     @Override

@@ -60,7 +60,7 @@ public class SpongeIRC {
     private Game game;
     @Inject
     private Logger logger;
-    private Set<Endpoint> registeredEndpoints = new CopyOnWriteArraySet<>();
+    private final Set<Endpoint> registeredEndpoints = new CopyOnWriteArraySet<>();
     private boolean reloading = false;
 
     @Listener

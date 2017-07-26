@@ -60,9 +60,7 @@ public class ChatEndpoint extends MinecraftEndpoint {
         Set<MinecraftPlayer> recipients = (Set<MinecraftPlayer>) message.getCustomData().get(ChatEndpoint.RECIPIENT_NAMES);
         for (MinecraftPlayer recipient : recipients) {
             Optional<Player> player = this.getPlugin().getGame().getServer().getPlayer(recipient.getName());
-            if (player.isPresent()) {
-                player.get().sendMessage(TextSerializers.LEGACY_FORMATTING_CODE.deserialize(message.getCustomMessage()));
-            }
+            player.ifPresent(pl -> pl.sendMessage(TextSerializers.LEGACY_FORMATTING_CODE.deserialize(message.getCustomMessage())));
         }
     }
 
