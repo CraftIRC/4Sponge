@@ -61,7 +61,6 @@
             <groupId>org.kitteh.irc</groupId>
             <artifactId>client-lib</artifactId>
             <version>3.2.1</version>
-            <classifier>shaded</classifier>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
@@ -130,7 +129,12 @@
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <relocations>
                                 <relocation>
-                                    <shadedPattern>org.kitteh.craftirc.lib</shadedPattern>
+                                    <pattern>io.netty</pattern>
+                                    <shadedPattern>org.kitteh.craftirc.lib.io.netty</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>net.engio</pattern>
+                                    <shadedPattern>org.kitteh.craftirc.lib.net.engio</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>

@@ -34,7 +34,7 @@ import org.kitteh.irc.client.library.element.mode.ChannelUserMode;
 import org.kitteh.irc.client.library.event.channel.ChannelCTCPEvent;
 import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 import org.kitteh.irc.client.library.util.CIKeyMap;
-import org.kitteh.irc.lib.net.engio.mbassy.listener.Handler;
+import net.engio.mbassy.listener.Handler;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
