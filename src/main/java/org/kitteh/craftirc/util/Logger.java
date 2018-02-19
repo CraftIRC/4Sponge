@@ -21,45 +21,21 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.kitteh.craftirc.sponge.util;
-
-import org.kitteh.irc.client.library.util.Sanity;
-import org.slf4j.Logger;
+package org.kitteh.craftirc.util;
 
 import javax.annotation.Nonnull;
 
 /**
- * Implements CraftIRC's logger wrapper.
+ * Wrap a logger.
  */
-public class Log4JWrapper implements org.kitteh.craftirc.util.Logger {
-    private final Logger logger;
+public interface Logger {
+    void info(@Nonnull String info);
 
-    public Log4JWrapper(Logger logger) {
-        this.logger = Sanity.nullCheck(logger, "Logger cannot be null");
-    }
+    void warning(@Nonnull String warning);
 
-    @Override
-    public void info(@Nonnull String info) {
-        this.logger.info(info);
-    }
+    void warning(@Nonnull String warning, @Nonnull Throwable thrown);
 
-    @Override
-    public void warning(@Nonnull String warn) {
-        this.logger.warn(warn);
-    }
+    void severe(@Nonnull String severe);
 
-    @Override
-    public void warning(@Nonnull String warn, @Nonnull Throwable thrown) {
-        this.logger.warn(warn, thrown);
-    }
-
-    @Override
-    public void severe(@Nonnull String severe) {
-        this.logger.error(severe);
-    }
-
-    @Override
-    public void severe(@Nonnull String severe, @Nonnull Throwable thrown) {
-        this.logger.error(severe, thrown);
-    }
+    void severe(@Nonnull String severe, @Nonnull Throwable thrown);
 }

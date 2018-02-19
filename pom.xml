@@ -11,72 +11,93 @@
     <url>http://kitteh.org/</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <javassist-plugin.version>1.1.0-KITTEH</javassist-plugin.version>
     </properties>
     <packaging>jar</packaging>
-    <inceptionYear>2015</inceptionYear>
+    <inceptionYear>2014</inceptionYear>
+
+    <licenses>
+        <license>
+            <name>MIT License (Expat)</name>
+            <url>http://opensource.org/licenses/mit-license.php</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <organization>
+        <name>Kitteh</name>
+        <url>http://kitteh.org</url>
+    </organization>
+
+    <developers>
+        <developer>
+            <id>mbaxter</id>
+            <name>Matt Baxter</name>
+            <email>matt@kitteh.org</email>
+            <url>http://kitteh.org</url>
+            <organization>Kitteh</organization>
+            <organizationUrl>http://kitteh.org</organizationUrl>
+        </developer>
+    </developers>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/CraftIRC/4Sponge/issues</url>
+    </issueManagement>
+
+    <ciManagement>
+        <system>TravisCI</system>
+        <url>https://travis-ci.org/CraftIRC/4Sponge</url>
+    </ciManagement>
 
     <repositories>
-        <repository>
-            <id>kitteh-repo</id>
-            <url>http://repo.kitteh.org/content/groups/public</url>
-        </repository>
         <repository>
             <id>sponge-repo</id>
             <url>http://repo.spongepowered.org/maven</url>
         </repository>
     </repositories>
 
-    <pluginRepositories>
-        <pluginRepository>
-            <id>kitteh-repo</id>
-            <url>http://repo.kitteh.org/content/groups/public</url>
-        </pluginRepository>
-    </pluginRepositories>
-
     <dependencies>
         <dependency>
-            <groupId>org.kitteh</groupId>
-            <artifactId>craftirc</artifactId>
-            <version>4.1.6-SNAPSHOT</version>
+            <groupId>org.kitteh.irc</groupId>
+            <artifactId>client-lib</artifactId>
+            <version>3.2.1</version>
+            <classifier>shaded</classifier>
             <type>jar</type>
-            <optional>true</optional>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.spongepowered</groupId>
             <artifactId>spongeapi</artifactId>
-            <version>5.0.0</version>
+            <version>7.0.0</version>
             <type>jar</type>
-            <optional>true</optional>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
             <version>3.0.0</version>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>de.icongmbh.oss.maven.plugins</groupId>
-            <artifactId>javassist-maven-plugin</artifactId>
-            <version>${javassist-plugin.version}</version>
-            <optional>true</optional>
+            <type>jar</type>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
+            <type>jar</type>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
-        <finalName>CraftIRC</finalName>
         <defaultGoal>clean install</defaultGoal>
         <resources>
+            <resource>
+                <targetPath>.</targetPath>
+                <directory>${basedir}/src/main/resources</directory>
+                <includes>
+                    <include>config.yml</include>
+                </includes>
+            </resource>
             <resource>
                 <targetPath>.</targetPath>
                 <directory>${basedir}/</directory>
@@ -98,7 +119,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.4.1</version>
+                <version>3.0.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -107,6 +128,11 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <relocations>
+                                <relocation>
+                                    <shadedPattern>org.kitteh.craftirc.lib</shadedPattern>
+                                </relocation>
+                            </relocations>
                         </configuration>
                     </execution>
                 </executions>

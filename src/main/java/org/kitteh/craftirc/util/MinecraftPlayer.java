@@ -21,45 +21,63 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.kitteh.craftirc.sponge.util;
+package org.kitteh.craftirc.util;
 
 import org.kitteh.irc.client.library.util.Sanity;
-import org.slf4j.Logger;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.UUID;
 
 /**
- * Implements CraftIRC's logger wrapper.
+ * Represents an ingame player
  */
-public class Log4JWrapper implements org.kitteh.craftirc.util.Logger {
-    private final Logger logger;
+public final class MinecraftPlayer {
+    private final String name;
+    private final UUID uniqueId;
 
-    public Log4JWrapper(Logger logger) {
-        this.logger = Sanity.nullCheck(logger, "Logger cannot be null");
+    /**
+     * Creates a MinecraftPlayer instance.
+     *
+     * @param name current name of the player
+     * @param uniqueId the player's UUID
+     */
+    public MinecraftPlayer(@Nonnull String name, @Nonnull UUID uniqueId) {
+        this.name = Sanity.nullCheck(name, "Name cannot be null");
+        this.uniqueId = Sanity.nullCheck(uniqueId, "uniqueId cannot be null");
+    }
+
+    /**
+     * Gets the name of this player.
+     *
+     * @return the player's name
+     */
+    @Nonnull
+    public String getName() {
+        return this.name;
+    }
+
+    /**
+     * Gets the UUID of this player.
+     *
+     * @return the player's UUID
+     */
+    @Nonnull
+    public UUID getUniqueID() {
+        return this.uniqueId;
     }
 
     @Override
-    public void info(@Nonnull String info) {
-        this.logger.info(info);
+    public boolean equals(@Nullable Object o) {
+        if (o instanceof MinecraftPlayer) {
+            MinecraftPlayer p = (MinecraftPlayer) o;
+            return this.name.equals(p.name) && this.uniqueId.equals(p.uniqueId);
+        }
+        return false;
     }
 
     @Override
-    public void warning(@Nonnull String warn) {
-        this.logger.warn(warn);
-    }
-
-    @Override
-    public void warning(@Nonnull String warn, @Nonnull Throwable thrown) {
-        this.logger.warn(warn, thrown);
-    }
-
-    @Override
-    public void severe(@Nonnull String severe) {
-        this.logger.error(severe);
-    }
-
-    @Override
-    public void severe(@Nonnull String severe, @Nonnull Throwable thrown) {
-        this.logger.error(severe, thrown);
+    public int hashCode() {
+        return (this.name.hashCode() * 7) + (this.uniqueId.hashCode() * 3);
     }
 }

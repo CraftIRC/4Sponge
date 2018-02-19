@@ -21,45 +21,34 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.kitteh.craftirc.sponge.util;
+package org.kitteh.craftirc.util.loadable;
 
-import org.kitteh.irc.client.library.util.Sanity;
-import org.slf4j.Logger;
-
-import javax.annotation.Nonnull;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Implements CraftIRC's logger wrapper.
+ * A variable to be loaded on Loadable load.
+ * TODO be compatble with enums and other fun loady types.
  */
-public class Log4JWrapper implements org.kitteh.craftirc.util.Logger {
-    private final Logger logger;
+@Retention(value = RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface Load {
+    /**
+     * Gets if this value is required. If true, and not found when loading, a
+     * {@link org.kitteh.craftirc.exceptions.CraftIRCInvalidConfigException}
+     * is thrown. Default value is true.
+     *
+     * @return true if required
+     */
+    boolean required() default true;
 
-    public Log4JWrapper(Logger logger) {
-        this.logger = Sanity.nullCheck(logger, "Logger cannot be null");
-    }
-
-    @Override
-    public void info(@Nonnull String info) {
-        this.logger.info(info);
-    }
-
-    @Override
-    public void warning(@Nonnull String warn) {
-        this.logger.warn(warn);
-    }
-
-    @Override
-    public void warning(@Nonnull String warn, @Nonnull Throwable thrown) {
-        this.logger.warn(warn, thrown);
-    }
-
-    @Override
-    public void severe(@Nonnull String severe) {
-        this.logger.error(severe);
-    }
-
-    @Override
-    public void severe(@Nonnull String severe, @Nonnull Throwable thrown) {
-        this.logger.error(severe, thrown);
-    }
+    /**
+     * Gets the name to load from the config. If an empty string, the field
+     * name will be used. This is the default.
+     *
+     * @return the name in the config
+     */
+    String name() default "";
 }

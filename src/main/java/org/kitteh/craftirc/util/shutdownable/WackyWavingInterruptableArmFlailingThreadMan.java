@@ -21,45 +21,41 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.kitteh.craftirc.sponge.util;
-
-import org.kitteh.irc.client.library.util.Sanity;
-import org.slf4j.Logger;
+package org.kitteh.craftirc.util.shutdownable;
 
 import javax.annotation.Nonnull;
 
 /**
- * Implements CraftIRC's logger wrapper.
+ * This Shutdownable simply calls {@link Thread#interrupt()} on a target
+ * thread.
+ * <p/>
+ * Thanks to a compilation error, I am currently overstocked on threads, and
+ * I am passing the savings on to you!
  */
-public class Log4JWrapper implements org.kitteh.craftirc.util.Logger {
-    private final Logger logger;
+public final class WackyWavingInterruptableArmFlailingThreadMan implements Shutdownable {
+    private final Thread target;
 
-    public Log4JWrapper(Logger logger) {
-        this.logger = Sanity.nullCheck(logger, "Logger cannot be null");
+    /**
+     * Wacky waving interruptable arm flailing thread man!
+     *
+     * @param target thread to shut down on {@link #shutdown()}
+     */
+    public WackyWavingInterruptableArmFlailingThreadMan(@Nonnull Thread target) {
+        this.target = target;
     }
 
     @Override
-    public void info(@Nonnull String info) {
-        this.logger.info(info);
+    public void shutdown() {
+        this.target.interrupt();
     }
 
     @Override
-    public void warning(@Nonnull String warn) {
-        this.logger.warn(warn);
+    public boolean equals(@Nonnull Object wackyWavingInterruptableArmFlailingThreadMan) {
+        return wackyWavingInterruptableArmFlailingThreadMan instanceof WackyWavingInterruptableArmFlailingThreadMan && this.target == ((WackyWavingInterruptableArmFlailingThreadMan) wackyWavingInterruptableArmFlailingThreadMan).target;
     }
 
     @Override
-    public void warning(@Nonnull String warn, @Nonnull Throwable thrown) {
-        this.logger.warn(warn, thrown);
-    }
-
-    @Override
-    public void severe(@Nonnull String severe) {
-        this.logger.error(severe);
-    }
-
-    @Override
-    public void severe(@Nonnull String severe, @Nonnull Throwable thrown) {
-        this.logger.error(severe, thrown);
+    public int hashCode() {
+        return this.target.hashCode() * 2;
     }
 }

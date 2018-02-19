@@ -21,55 +21,38 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.kitteh.craftirc.sponge;
+package org.kitteh.craftirc.endpoint.filter.defaults;
 
 import org.kitteh.craftirc.endpoint.TargetedMessage;
 import org.kitteh.craftirc.endpoint.filter.Filter;
-import org.kitteh.craftirc.util.MinecraftPlayer;
 import org.kitteh.craftirc.util.loadable.Load;
 import org.kitteh.craftirc.util.loadable.Loadable;
-import org.spongepowered.api.entity.living.player.Player;
 
 import javax.annotation.Nonnull;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
 
 /**
- * A filter by permission node.
+ * Anti highlight aww yes.
  */
-@Loadable.Type(name = "permission")
-public final class PermissionFilter extends Filter {
+@Loadable.Type(name = "antihighlight")
+public class AntiHighlight extends Filter {
     @Load
-    private String permission;
-    private final SpongeIRC plugin;
-
-    public PermissionFilter(@Nonnull SpongeIRC plugin) {
-        this.plugin = plugin;
-    }
-
-    /**
-     * Gets the permission node being monitored.
-     *
-     * @return the permission node monitored
-     */
-    @Nonnull
-    public String getPermission() {
-        return this.permission;
-    }
+    private String splitter;
+    @Load
+    private String variable;
 
     @Override
     public void processMessage(@Nonnull TargetedMessage message) {
-        if (message.getCustomData().containsKey(ChatEndpoint.RECIPIENT_NAMES)) {
-            @SuppressWarnings("unchecked")
-            List<MinecraftPlayer> players = (List<MinecraftPlayer>) message.getCustomData().get(ChatEndpoint.RECIPIENT_NAMES);
-            Iterator<MinecraftPlayer> iterator = players.iterator();
-            while (iterator.hasNext()) {
-                MinecraftPlayer minecraftPlayer = iterator.next();
-                Optional<Player> player = this.plugin.getGame().getServer().getPlayer(minecraftPlayer.getName());
-                if (!player.isPresent() || !player.get().hasPermission(this.getPermission())) {
-                    iterator.remove();
+        if (message.getCustomData().containsKey(this.variable)) {
+            String oldValue = message.getCustomData().get(this.variable).toString();
+            if (oldValue.length() > 1) {
+                StringBuilder builder = new StringBuilder();
+                for (char c : oldValue.toCharArray()) {
+                    builder.append(c).append(this.splitter);
                 }
+                builder.setLength(builder.length() - this.splitter.length());
+                String newValue = builder.toString();
+                message.getCustomData().put(this.variable, newValue);
+                message.setCustomMessage(message.getCustomMessage().replace(oldValue, newValue));
             }
         }
     }

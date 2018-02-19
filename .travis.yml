@@ -6,10 +6,3 @@ cache:
   - $HOME/.m2
 notifications:
   email: false
-deploy:
-  provider: releases
-  api_key:
-    secure: YbPuIXVOGfWXHtV7oPBLu7H57z9bZUOg8B99AEPw++x+3fXWUyv0p4f+XxaLGvmkR1t2FI9aHviQNB6EtME8r8a1LVvEa/+ISwtXN+0+VLHFy65y8VV//mtGc3+T0RsonV3nGTffUHRMxLsajzWBjnzBXJl3xEKhMGsjPCVrVLs=
-  file: target/CraftIRC.jar
-  on:
-    tags: true

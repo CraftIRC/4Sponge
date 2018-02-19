@@ -21,45 +21,15 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.kitteh.craftirc.sponge.util;
-
-import org.kitteh.irc.client.library.util.Sanity;
-import org.slf4j.Logger;
-
-import javax.annotation.Nonnull;
-
 /**
- * Implements CraftIRC's logger wrapper.
+ * When running systems that need some sort of cleanup on plugin shutdown, be
+ * it interrupting a thread or storing/sending one final bit of information,
+ * the {@link org.kitteh.craftirc.util.shutdownable.Shutdownable} interface
+ * is there to handle your shutting down needs. The main plugin class
+ * provides the {@link
+ * org.kitteh.craftirc.CraftIRC#trackShutdownable(Shutdownable)} method to
+ * automagically handle shutting down of a given Shutdownable. For a premade
+ * Thread handler, see {@link
+ * org.kitteh.craftirc.util.shutdownable.WackyWavingInterruptableArmFlailingThreadMan}
  */
-public class Log4JWrapper implements org.kitteh.craftirc.util.Logger {
-    private final Logger logger;
-
-    public Log4JWrapper(Logger logger) {
-        this.logger = Sanity.nullCheck(logger, "Logger cannot be null");
-    }
-
-    @Override
-    public void info(@Nonnull String info) {
-        this.logger.info(info);
-    }
-
-    @Override
-    public void warning(@Nonnull String warn) {
-        this.logger.warn(warn);
-    }
-
-    @Override
-    public void warning(@Nonnull String warn, @Nonnull Throwable thrown) {
-        this.logger.warn(warn, thrown);
-    }
-
-    @Override
-    public void severe(@Nonnull String severe) {
-        this.logger.error(severe);
-    }
-
-    @Override
-    public void severe(@Nonnull String severe, @Nonnull Throwable thrown) {
-        this.logger.error(severe, thrown);
-    }
-}
+package org.kitteh.craftirc.util.shutdownable;

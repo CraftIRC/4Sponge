@@ -21,45 +21,38 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.kitteh.craftirc.sponge.util;
+package org.kitteh.craftirc.util.loadable;
 
-import org.kitteh.irc.client.library.util.Sanity;
-import org.slf4j.Logger;
+import ninja.leaping.configurate.ConfigurationNode;
+import org.kitteh.craftirc.CraftIRC;
+import org.kitteh.craftirc.exceptions.CraftIRCInvalidConfigException;
 
 import javax.annotation.Nonnull;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
- * Implements CraftIRC's logger wrapper.
+ * Represents an object that can be loaded from config.
  */
-public class Log4JWrapper implements org.kitteh.craftirc.util.Logger {
-    private final Logger logger;
-
-    public Log4JWrapper(Logger logger) {
-        this.logger = Sanity.nullCheck(logger, "Logger cannot be null");
+public abstract class Loadable {
+    /**
+     * Defines a Loadable's information.
+     */
+    @Retention(value = RetentionPolicy.RUNTIME)
+    public @interface Type {
+        /**
+         * Gets the name of the loadable.
+         *
+         * @return loadable name
+         */
+        String name();
     }
 
-    @Override
-    public void info(@Nonnull String info) {
-        this.logger.info(info);
-    }
-
-    @Override
-    public void warning(@Nonnull String warn) {
-        this.logger.warn(warn);
-    }
-
-    @Override
-    public void warning(@Nonnull String warn, @Nonnull Throwable thrown) {
-        this.logger.warn(warn, thrown);
-    }
-
-    @Override
-    public void severe(@Nonnull String severe) {
-        this.logger.error(severe);
-    }
-
-    @Override
-    public void severe(@Nonnull String severe, @Nonnull Throwable thrown) {
-        this.logger.error(severe, thrown);
-    }
+    /**
+     * Loads data from config, if any is present.
+     *
+     * @param data data to load
+     * @throws CraftIRCInvalidConfigException if invalid
+     */
+    protected abstract void load(@Nonnull CraftIRC plugin, @Nonnull ConfigurationNode data) throws CraftIRCInvalidConfigException;
 }

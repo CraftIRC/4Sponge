@@ -21,45 +21,20 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.kitteh.craftirc.sponge.util;
-
-import org.kitteh.irc.client.library.util.Sanity;
-import org.slf4j.Logger;
+package org.kitteh.craftirc.exceptions;
 
 import javax.annotation.Nonnull;
+import java.io.IOException;
 
 /**
- * Implements CraftIRC's logger wrapper.
+ * Invalid configs trigger these
  */
-public class Log4JWrapper implements org.kitteh.craftirc.util.Logger {
-    private final Logger logger;
-
-    public Log4JWrapper(Logger logger) {
-        this.logger = Sanity.nullCheck(logger, "Logger cannot be null");
+public class CraftIRCInvalidConfigException extends Exception {
+    public CraftIRCInvalidConfigException(@Nonnull String message) {
+        super(message);
     }
 
-    @Override
-    public void info(@Nonnull String info) {
-        this.logger.info(info);
-    }
-
-    @Override
-    public void warning(@Nonnull String warn) {
-        this.logger.warn(warn);
-    }
-
-    @Override
-    public void warning(@Nonnull String warn, @Nonnull Throwable thrown) {
-        this.logger.warn(warn, thrown);
-    }
-
-    @Override
-    public void severe(@Nonnull String severe) {
-        this.logger.error(severe);
-    }
-
-    @Override
-    public void severe(@Nonnull String severe, @Nonnull Throwable thrown) {
-        this.logger.error(severe, thrown);
+    public CraftIRCInvalidConfigException(@Nonnull IOException e) {
+        super("Could not load config file. See related exception", e);
     }
 }
