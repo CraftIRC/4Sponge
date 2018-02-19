@@ -103,7 +103,7 @@ public class Link {
                     return;
                 }
             } catch (Throwable thrown) {
-                CraftIRC.log().warning("Unable to process a received message", thrown);
+                CraftIRC.log().warn("Unable to process a received message", thrown);
             }
         }
     }

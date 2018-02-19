@@ -81,16 +81,16 @@ public final class BotManager {
                 continue;
             }
             if (!usedBotNames.add(name)) {
-                CraftIRC.log().warning(String.format("Ignoring duplicate bot with name %s", name));
+                CraftIRC.log().warn(String.format("Ignoring duplicate bot with name %s", name));
                 continue;
             }
             this.addBot(name, node);
         }
         if (nonMap > 0) {
-            CraftIRC.log().warning(String.format("Bots list contained %d entries which were not maps", nonMap));
+            CraftIRC.log().warn(String.format("Bots list contained %d entries which were not maps", nonMap));
         }
         if (noName > 0) {
-            CraftIRC.log().warning(String.format("Bots list contained %d entries without a 'name'", noName));
+            CraftIRC.log().warn(String.format("Bots list contained %d entries without a 'name'", noName));
         }
     }
 
@@ -122,7 +122,7 @@ public final class BotManager {
 
         ConfigurationNode debug = data.getNode("debug-output");
         if (debug.getNode("exceptions").getBoolean()) {
-            botBuilder.exceptionListener(exception -> CraftIRC.log().warning("Exception on bot " + name, exception));
+            botBuilder.exceptionListener(exception -> CraftIRC.log().warn("Exception on bot " + name, exception));
         } else {
             botBuilder.exceptionListener(null);
         }
@@ -138,6 +138,8 @@ public final class BotManager {
         if (authUser != null && authPass != null) {
             newBot.getAuthManager().addProtocol(nickless ? new NicklessServ(newBot, authUser, authPass) : new NickServ(newBot, authUser, authPass));
         }
+
+        newBot.connect();
 
         this.bots.put(name, new IRCBot(this.plugin, name, newBot));
     }

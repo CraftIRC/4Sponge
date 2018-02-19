@@ -23,8 +23,10 @@
  */
 package org.kitteh.craftirc;
 
+import com.google.inject.Inject;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
+import org.kitteh.craftirc.endpoint.Endpoint;
 import org.kitteh.craftirc.endpoint.EndpointManager;
 import org.kitteh.craftirc.endpoint.filter.FilterManager;
 import org.kitteh.craftirc.endpoint.link.LinkManager;
@@ -32,8 +34,23 @@ import org.kitteh.craftirc.exceptions.CraftIRCInvalidConfigException;
 import org.kitteh.craftirc.exceptions.CraftIRCUnableToStartException;
 import org.kitteh.craftirc.exceptions.CraftIRCWillLeakTearsException;
 import org.kitteh.craftirc.irc.BotManager;
-import org.kitteh.craftirc.util.Logger;
+import org.kitteh.craftirc.sponge.ChatEndpoint;
+import org.kitteh.craftirc.sponge.JoinEndpoint;
+import org.kitteh.craftirc.sponge.PermissionFilter;
+import org.kitteh.craftirc.sponge.QuitEndpoint;
 import org.kitteh.craftirc.util.shutdownable.Shutdownable;
+import org.slf4j.Logger;
+import org.spongepowered.api.Game;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.config.ConfigDir;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.event.game.state.GameStartingServerEvent;
+import org.spongepowered.api.event.game.state.GameStoppingEvent;
+import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -47,19 +64,144 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-/**
- * CraftIRC's core. Be sure to call {@link #shutdown()} when finished to
- * ensure that all running operations complete and clean up threads.
- */
+
+@Plugin(id = "craftirc", name = "CraftIRC", version = "4.2.0-SNAPSHOT", authors = "mbaxter",
+        description = "Relay between IRC and Minecraft", url = "http://kitteh.org")
 public final class CraftIRC {
-    private static Logger logger;
+    private static Logger loggy;
+    private static final String PERMISSION_RELOAD = "craftirc.reload";
+
+    @Inject
+    @ConfigDir(sharedRoot = false)
+    private File configDir;
+    @Inject
+    private Game game;
+    @Inject
+    private Logger logger;
+    private final Set<Endpoint> registeredEndpoints = new CopyOnWriteArraySet<>();
+    private boolean reloading = false;
+    private String version = CraftIRC.class.getAnnotation(Plugin.class).version();
+
+    @Listener
+    public void init(@Nonnull GameInitializationEvent event) {
+        this.startMeUp();
+        System.out.println("Hello again");
+    }
+
+    @Listener
+    public void starting(@Nonnull GameStartingServerEvent event) {
+        CommandSpec reloadSpec = CommandSpec.builder()
+                .executor((commandSource, commandContext) -> {
+                    if (this.reloading) {
+                        commandSource.sendMessage(Text.of(TextColors.RED, "CraftIRC reload already in progress"));
+                    } else {
+                        this.reloading = true;
+                        commandSource.sendMessage(Text.of(TextColors.AQUA, "CraftIRC reload scheduled"));
+                        this.game.getScheduler().createTaskBuilder()
+                                .async()
+                                .execute(() -> {
+                                    this.dontMakeAGrownManCry();
+                                    this.startMeUp();
+                                    this.reloading = false;
+                                })
+                                .name("CraftIRC Reloading...")
+                                .submit(this);
+                    }
+                    return CommandResult.success();
+                })
+                .permission(PERMISSION_RELOAD)
+                .build();
+        CommandSpec mainSpec = CommandSpec.builder()
+                .child(reloadSpec, "reload")
+                .executor((commandSource, commandContext) -> {
+                    commandSource.sendMessage(Text.of(TextColors.AQUA, "CraftIRC version ", TextColors.WHITE, this.version, TextColors.AQUA, " - Powered by Kittens"));
+                    return CommandResult.success();
+                })
+                .build();
+        this.game.getCommandManager().register(this, mainSpec, "craftirc");
+    }
+
+    @Listener
+    public void stahp(@Nonnull GameStoppingEvent event) {
+        this.dontMakeAGrownManCry();
+    }
+
+    @Nonnull
+    public Game getGame() {
+        return this.game;
+    }
+
+    public void registerEndpoint(Endpoint endpoint) {
+        this.registeredEndpoints.add(endpoint);
+        this.game.getEventManager().registerListeners(this, endpoint);
+    }
+
+    private synchronized void startMeUp() {
+        try {
+            CraftIRC.loggy = logger;
+
+            File configFile = new File(this.configDir, "config.yml");
+            if (!configFile.exists()) {
+                log().info("No config.yml found, creating a default configuration.");
+                this.saveDefaultConfig(this.configDir);
+            }
+
+            YAMLConfigurationLoader yamlConfigurationLoader = YAMLConfigurationLoader.builder().setPath(configFile.toPath()).build();
+            ConfigurationNode root = yamlConfigurationLoader.load();
+
+            if (root.isVirtual()) {
+                throw new CraftIRCInvalidConfigException("Config doesn't appear valid. Would advise starting from scratch.");
+            }
+
+            ConfigurationNode repeatableFilters = root.getNode("repeatable-filters");
+
+            ConfigurationNode botsNode = root.getNode("bots");
+            List<? extends ConfigurationNode> bots;
+            if (botsNode.isVirtual() || (bots = botsNode.getChildrenList()).isEmpty()) {
+                throw new CraftIRCInvalidConfigException("No bots defined!");
+            }
+
+            ConfigurationNode endpointsNode = root.getNode("endpoints");
+            List<? extends ConfigurationNode> endpoints;
+            if (endpointsNode.isVirtual() || (endpoints = endpointsNode.getChildrenList()).isEmpty()) {
+                throw new CraftIRCInvalidConfigException("No endpoints defined! Would advise starting from scratch.");
+            }
+
+            ConfigurationNode linksNode = root.getNode("links");
+            List<? extends ConfigurationNode> links;
+            if (linksNode.isVirtual() || (links = linksNode.getChildrenList()).isEmpty()) {
+                throw new CraftIRCInvalidConfigException("No links defined! How can your endpoints be useful?");
+            }
+
+            this.filterManager = new FilterManager(this, repeatableFilters);
+            this.botManager = new BotManager(this, bots);
+            this.endpointManager = new EndpointManager(this, endpoints);
+            this.linkManager = new LinkManager(this, links);
+        } catch (Exception e) {
+            this.logger.error("Uh oh", new CraftIRCUnableToStartException("Could not start CraftIRC!", e));
+        }
+        this.getFilterManager().registerArgumentProvider(CraftIRC.class, () -> CraftIRC.this);
+        this.getFilterManager().registerType(PermissionFilter.class);
+        this.getEndpointManager().registerArgumentProvider(CraftIRC.class, () -> CraftIRC.this);
+        this.getEndpointManager().registerType(ChatEndpoint.class);
+        this.getEndpointManager().registerType(JoinEndpoint.class);
+        this.getEndpointManager().registerType(QuitEndpoint.class);
+    }
+
+    private synchronized void dontMakeAGrownManCry() {
+        this.registeredEndpoints.forEach(endpoint -> this.game.getEventManager().unregisterListeners(endpoint));
+        this.registeredEndpoints.clear();
+        this.shutdownables.forEach(Shutdownable::shutdown);
+        // And lastly...
+        CraftIRC.loggy = null;
+    }
 
     @Nonnull
     public static Logger log() {
-        if (CraftIRC.logger == null) {
+        if (CraftIRC.loggy == null) {
             throw new CraftIRCWillLeakTearsException();
         }
-        return CraftIRC.logger;
+        return CraftIRC.loggy;
     }
 
     private BotManager botManager;
@@ -97,74 +239,6 @@ public final class CraftIRC {
         this.shutdownables.add(shutdownable);
     }
 
-    /**
-     * Starts up CraftIRC.
-     * <p/>
-     * The {@link Logger} provided to CraftIRC will be utilized for a child
-     * logger which will prefix all messages with "[CraftIRC] ".
-     *
-     * @param logger a logger for CraftIRC to use
-     * @param dataFolder the folder in which config.yml is located
-     * @throws CraftIRCUnableToStartException if startup fails
-     */
-    public CraftIRC(@Nonnull Logger logger, @Nonnull File dataFolder) throws CraftIRCUnableToStartException {
-        try {
-            CraftIRC.logger = logger;
-
-            File configFile = new File(dataFolder, "config.yml");
-            if (!configFile.exists()) {
-                log().info("No config.yml found, creating a default configuration.");
-                this.saveDefaultConfig(dataFolder);
-            }
-
-            YAMLConfigurationLoader yamlConfigurationLoader = YAMLConfigurationLoader.builder().setPath(configFile.toPath()).build();
-            ConfigurationNode root = yamlConfigurationLoader.load();
-
-            if (root.isVirtual()) {
-                throw new CraftIRCInvalidConfigException("Config doesn't appear valid. Would advise starting from scratch.");
-            }
-
-            ConfigurationNode repeatableFilters = root.getNode("repeatable-filters");
-
-            ConfigurationNode botsNode = root.getNode("bots");
-            List<? extends ConfigurationNode> bots;
-            if (botsNode.isVirtual() || (bots = botsNode.getChildrenList()).isEmpty()) {
-                throw new CraftIRCInvalidConfigException("No bots defined!");
-            }
-
-            ConfigurationNode endpointsNode = root.getNode("endpoints");
-            List<? extends ConfigurationNode> endpoints;
-            if (endpointsNode.isVirtual() || (endpoints = endpointsNode.getChildrenList()).isEmpty()) {
-                throw new CraftIRCInvalidConfigException("No endpoints defined! Would advise starting from scratch.");
-            }
-
-            ConfigurationNode linksNode = root.getNode("links");
-            List<? extends ConfigurationNode> links;
-            if (linksNode.isVirtual() || (links = linksNode.getChildrenList()).isEmpty()) {
-                throw new CraftIRCInvalidConfigException("No links defined! How can your endpoints be useful?");
-            }
-
-            this.filterManager = new FilterManager(this, repeatableFilters);
-            this.botManager = new BotManager(this, bots);
-            this.endpointManager = new EndpointManager(this, endpoints);
-            this.linkManager = new LinkManager(this, links);
-        } catch (Exception e) {
-            throw new CraftIRCUnableToStartException("Could not start CraftIRC!", e);
-        }
-    }
-
-    /**
-     * Shuts down any running threads and finishes any other running
-     * operations. This method calls {@link Shutdownable#shutdown()} on all
-     * {@link Shutdownable} registered to
-     * {@link #trackShutdownable(Shutdownable)}.
-     */
-    public void shutdown() {
-        this.shutdownables.forEach(Shutdownable::shutdown);
-        // And lastly...
-        CraftIRC.logger = null;
-    }
-
     private void saveDefaultConfig(@Nonnull File dataFolder) {
         if (!dataFolder.exists()) {
             dataFolder.mkdirs();
@@ -172,7 +246,7 @@ public final class CraftIRC {
         try {
             URL url = this.getClass().getClassLoader().getResource("config.yml");
             if (url == null) {
-                log().warning("Could not find a default config to copy!");
+                log().warn("Could not find a default config to copy!");
                 return;
             }
 
@@ -192,7 +266,7 @@ public final class CraftIRC {
             output.close();
             input.close();
         } catch (IOException ex) {
-            log().severe("Exception while saving default config", ex);
+            log().error("Exception while saving default config", ex);
         }
     }
 }

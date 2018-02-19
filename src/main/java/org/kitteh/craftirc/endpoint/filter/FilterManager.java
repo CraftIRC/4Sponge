@@ -102,11 +102,11 @@ public final class FilterManager extends LoadableTypeManager<Filter> {
 
     @Override
     protected void processFailedLoad(@Nonnull Exception exception, @Nonnull ConfigurationNode data) {
-        CraftIRC.log().warning("Failed to load Filter", exception);
+        CraftIRC.log().warn("Failed to load Filter", exception);
     }
 
     @Override
     protected void processInvalid(@Nonnull String reason, @Nonnull ConfigurationNode data) {
-        CraftIRC.log().warning("Encountered invalid Filter: " + reason);
+        CraftIRC.log().warn("Encountered invalid Filter: " + reason);
     }
 }

@@ -23,6 +23,7 @@
  */
 package org.kitteh.craftirc.sponge;
 
+import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.endpoint.TargetedMessage;
 import org.kitteh.craftirc.endpoint.filter.Filter;
 import org.kitteh.craftirc.util.MinecraftPlayer;
@@ -42,9 +43,9 @@ import java.util.Optional;
 public final class PermissionFilter extends Filter {
     @Load
     private String permission;
-    private final SpongeIRC plugin;
+    private final CraftIRC plugin;
 
-    public PermissionFilter(@Nonnull SpongeIRC plugin) {
+    public PermissionFilter(@Nonnull CraftIRC plugin) {
         this.plugin = plugin;
     }
 

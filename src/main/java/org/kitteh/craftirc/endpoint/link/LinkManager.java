@@ -67,16 +67,16 @@ public final class LinkManager {
             this.addLink(new Link(plugin, source, target, filters));
         }
         if (nonMap > 0) {
-            CraftIRC.log().warning(String.format("Links list contained %d entries which were not maps", nonMap));
+            CraftIRC.log().warn(String.format("Links list contained %d entries which were not maps", nonMap));
         }
         if (noSource > 0) {
-            CraftIRC.log().warning(String.format("Links list contained %d entries without a source specified", noSource));
+            CraftIRC.log().warn(String.format("Links list contained %d entries without a source specified", noSource));
         }
         if (noTarget > 0) {
-            CraftIRC.log().warning(String.format("Links list contained %d entries without a target specified", noTarget));
+            CraftIRC.log().warn(String.format("Links list contained %d entries without a target specified", noTarget));
         }
         if (this.links.isEmpty()) {
-            CraftIRC.log().severe("Loaded no links! Nothing will be passed between any Endpoints!");
+            CraftIRC.log().error("Loaded no links! Nothing will be passed between any Endpoints!");
         }
     }
 

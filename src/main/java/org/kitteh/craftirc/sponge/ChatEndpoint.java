@@ -23,6 +23,7 @@
  */
 package org.kitteh.craftirc.sponge;
 
+import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.endpoint.Endpoint;
 import org.kitteh.craftirc.endpoint.Message;
 import org.kitteh.craftirc.endpoint.TargetedMessage;
@@ -50,7 +51,7 @@ import java.util.Set;
  */
 @Loadable.Type(name = "mc-chat")
 public class ChatEndpoint extends MinecraftEndpoint {
-    public ChatEndpoint(@Nonnull SpongeIRC plugin) {
+    public ChatEndpoint(@Nonnull CraftIRC plugin) {
         super(plugin);
     }
 
@@ -82,7 +83,7 @@ public class ChatEndpoint extends MinecraftEndpoint {
                 data.put(Endpoint.MESSAGE_FORMAT, format);
                 data.put(Endpoint.MESSAGE_TEXT, message);
                 data.put(Endpoint.SENDER_NAME, sender);
-                this.getPlugin().getCraftIRC().ifPresent(craftIRC -> craftIRC.getEndpointManager().sendMessage(new Message(this, String.format(format, sender, message), data)));
+                this.getPlugin().getEndpointManager().sendMessage(new Message(this, String.format(format, sender, message), data));
             }
         } else if (text instanceof LiteralText) {
             LiteralText literalText = (LiteralText) text;
@@ -100,7 +101,7 @@ public class ChatEndpoint extends MinecraftEndpoint {
                     data.put(Endpoint.MESSAGE_TEXT, message);
                     String sender = TextSerializers.LEGACY_FORMATTING_CODE.serialize(one);
                     data.put(Endpoint.SENDER_NAME, sender);
-                    this.getPlugin().getCraftIRC().ifPresent(craftIRC -> craftIRC.getEndpointManager().sendMessage(new Message(this, String.format("<%s> %s", sender, message), data)));
+                    this.getPlugin().getEndpointManager().sendMessage(new Message(this, String.format("<%s> %s", sender, message), data));
                 }
             }
         }

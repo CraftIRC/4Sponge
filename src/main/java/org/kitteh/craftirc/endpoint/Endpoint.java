@@ -120,7 +120,7 @@ public abstract class Endpoint extends Loadable {
         try {
             this.preProcessReceivedMessage(targetedMessage);
         } catch (Throwable thrown) {
-            CraftIRC.log().warning("Unable to preprocess a received message", thrown);
+            CraftIRC.log().warn("Unable to preprocess a received message", thrown);
         }
         link.filterMessage(targetedMessage);
         if (targetedMessage.isRejected()) {

@@ -23,6 +23,7 @@
  */
 package org.kitteh.craftirc.sponge;
 
+import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.endpoint.Endpoint;
 import org.kitteh.craftirc.endpoint.TargetedMessage;
 import org.kitteh.craftirc.util.MinecraftPlayer;
@@ -45,15 +46,15 @@ import java.util.stream.Collectors;
 public abstract class MinecraftEndpoint extends Endpoint {
     public static final String RECIPIENT_NAMES = "RECIPIENT_NAMES";
 
-    private final SpongeIRC plugin;
+    private final CraftIRC plugin;
 
-    public MinecraftEndpoint(@Nonnull SpongeIRC plugin) {
+    public MinecraftEndpoint(@Nonnull CraftIRC plugin) {
         this.plugin = plugin;
         this.plugin.registerEndpoint(this);
     }
 
     @Nonnull
-    protected SpongeIRC getPlugin() {
+    protected CraftIRC getPlugin() {
         return this.plugin;
     }
 

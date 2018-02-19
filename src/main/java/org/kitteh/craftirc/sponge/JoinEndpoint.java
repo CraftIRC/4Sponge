@@ -23,6 +23,7 @@
  */
 package org.kitteh.craftirc.sponge;
 
+import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.endpoint.Endpoint;
 import org.kitteh.craftirc.endpoint.Message;
 import org.kitteh.craftirc.endpoint.TargetedMessage;
@@ -42,7 +43,7 @@ import java.util.Set;
  */
 @Loadable.Type(name = "mc-join")
 public class JoinEndpoint extends MinecraftEndpoint {
-    public JoinEndpoint(@Nonnull SpongeIRC plugin) {
+    public JoinEndpoint(@Nonnull CraftIRC plugin) {
         super(plugin);
     }
 
@@ -60,6 +61,6 @@ public class JoinEndpoint extends MinecraftEndpoint {
         Set<MinecraftPlayer> recipients = this.collectionToMinecraftPlayer(event.getChannel().get().getMembers());
         data.put(JoinEndpoint.SENDER_NAME, event.getCause().first(Player.class).get().getName());
         data.put(JoinEndpoint.RECIPIENT_NAMES, recipients);
-        this.getPlugin().getCraftIRC().ifPresent(craftIRC -> craftIRC.getEndpointManager().sendMessage(new Message(this, event.getTargetEntity().getName() + " joined the game", data)));
+        this.getPlugin().getEndpointManager().sendMessage(new Message(this, event.getTargetEntity().getName() + " joined the game", data));
     }
 }

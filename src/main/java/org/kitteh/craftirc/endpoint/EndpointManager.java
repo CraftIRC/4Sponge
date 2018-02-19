@@ -99,11 +99,11 @@ public final class EndpointManager extends LoadableTypeManager<Endpoint> {
 
     @Override
     protected void processFailedLoad(@Nonnull Exception exception, @Nonnull ConfigurationNode data) {
-        CraftIRC.log().warning("Failed to load Endpoint", exception);
+        CraftIRC.log().warn("Failed to load Endpoint", exception);
     }
 
     @Override
     protected void processInvalid(@Nonnull String reason, @Nonnull ConfigurationNode data) {
-        CraftIRC.log().warning("Encountered invalid Endpoint: " + reason);
+        CraftIRC.log().warn("Encountered invalid Endpoint: " + reason);
     }
 }
