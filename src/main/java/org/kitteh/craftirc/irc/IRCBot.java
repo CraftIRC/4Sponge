@@ -31,7 +31,7 @@ import org.kitteh.irc.client.library.Client;
 import org.kitteh.irc.client.library.element.Channel;
 import org.kitteh.irc.client.library.element.User;
 import org.kitteh.irc.client.library.element.mode.ChannelUserMode;
-import org.kitteh.irc.client.library.event.channel.ChannelCTCPEvent;
+import org.kitteh.irc.client.library.event.channel.ChannelCtcpEvent;
 import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 import org.kitteh.irc.client.library.util.CIKeyMap;
 import net.engio.mbassy.listener.Handler;
@@ -143,7 +143,7 @@ public final class IRCBot {
         }
 
         @Handler
-        public void action(@Nonnull ChannelCTCPEvent event) {
+        public void action(@Nonnull ChannelCtcpEvent event) {
             if (event.getMessage().startsWith("ACTION ")) {
                 IRCBot.this.sendMessage(event.getActor(), event.getChannel(), event.getMessage().substring("ACTION ".length()), IRCEndpoint.MessageType.ME);
             }

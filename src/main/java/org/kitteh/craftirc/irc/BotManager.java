@@ -119,23 +119,26 @@ public final class BotManager {
         String authUser = auth.getNode("user").getString();
         String authPass = auth.getNode("pass").getString();
         boolean nickless = auth.getNode("nickless").getBoolean();
-        if (authUser != null && authPass != null) {
-            botBuilder.afterBuildConsumer(client -> client.getAuthManager().addProtocol(nickless ? new NicklessServ(client, authUser, authPass) : new NickServ(client, authUser, authPass)));
-        }
 
         ConfigurationNode debug = data.getNode("debug-output");
         if (debug.getNode("exceptions").getBoolean()) {
-            botBuilder.listenException(exception -> CraftIRC.log().warning("Exception on bot " + name, exception));
+            botBuilder.exceptionListener(exception -> CraftIRC.log().warning("Exception on bot " + name, exception));
         } else {
-            botBuilder.listenException(null);
+            botBuilder.exceptionListener(null);
         }
         if (debug.getNode("input").getBoolean()) {
-            botBuilder.listenInput(input -> CraftIRC.log().info("[IN] " + input));
+            botBuilder.inputListener(input -> CraftIRC.log().info("[IN] " + input));
         }
         if (debug.getNode("output").getBoolean()) {
-            botBuilder.listenOutput(output -> CraftIRC.log().info("[OUT] " + output));
+            botBuilder.outputListener(output -> CraftIRC.log().info("[OUT] " + output));
         }
 
-        this.bots.put(name, new IRCBot(this.plugin, name, botBuilder.build()));
+        Client newBot = botBuilder.build();
+
+        if (authUser != null && authPass != null) {
+            newBot.getAuthManager().addProtocol(nickless ? new NicklessServ(newBot, authUser, authPass) : new NickServ(newBot, authUser, authPass));
+        }
+
+        this.bots.put(name, new IRCBot(this.plugin, name, newBot));
     }
 }
