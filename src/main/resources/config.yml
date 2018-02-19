@@ -1,0 +1,38 @@
+bots:
+  - host: localhost
+    name: MyInternalBotName
+    nick: CraftIRC
+    debug-output:
+      exceptions: false
+      input: false
+      output: false
+endpoints:
+  - name: Chat
+    type: mc-chat
+  - name: Join
+    type: mc-join
+  - name: Quit
+    type: mc-quit
+  - name: IRC
+    type: irc
+    extra:
+      bot: MyInternalBotName
+      channel: "#craftirc"
+links:
+  - source: Chat
+    target: IRC
+    filters:
+      - colorize
+  - source: IRC
+    target: Chat
+    filters:
+      - colorize
+      - type: datamapper
+        message: "[IRC] <%IRC_PREFIX%%SENDER_NAME%> %MESSAGE_TEXT%"
+  - source: Join
+    target: IRC
+  - source: Quit
+    target: IRC
+repeatable-filters:
+  colorize:
+    type: color
