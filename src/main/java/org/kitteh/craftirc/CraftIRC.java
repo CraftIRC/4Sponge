@@ -65,7 +65,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 
-@Plugin(id = "craftirc", name = "CraftIRC", version = "4.2.0-SNAPSHOT", authors = "mbaxter",
+@Plugin(id = "craftirc", name = "CraftIRC", version = "4.2.0", authors = "mbaxter",
         description = "Relay between IRC and Minecraft", url = "http://kitteh.org")
 public final class CraftIRC {
     private static Logger loggy;

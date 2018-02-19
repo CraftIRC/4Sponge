@@ -3,10 +3,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.kitteh</groupId>
-    <artifactId>craftirc-sponge</artifactId>
+    <artifactId>craftirc</artifactId>
 
     <name>CraftIRC Sponge</name>
-    <version>4.2.0-SNAPSHOT</version>
+    <version>4.2.0</version>
 
     <url>http://kitteh.org/</url>
     <properties>
