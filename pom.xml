@@ -6,7 +6,7 @@
     <artifactId>craftirc</artifactId>
 
     <name>CraftIRC Sponge</name>
-    <version>4.2.0</version>
+    <version>4.2.1-SNAPSHOT</version>
 
     <url>http://kitteh.org/</url>
     <properties>
