@@ -31,6 +31,7 @@ import org.kitteh.craftirc.util.MinecraftPlayer;
 import org.kitteh.craftirc.util.loadable.Loadable;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 
 import javax.annotation.Nonnull;
@@ -53,13 +54,13 @@ public class QuitEndpoint extends MinecraftEndpoint {
     }
 
     @Listener
-    public void onChat(@Nonnull ClientConnectionEvent.Disconnect event) {
+    public void onChat(@Nonnull ClientConnectionEvent.Disconnect event, @First Player player) {
         if (!event.getChannel().isPresent()) {
             return;
         }
         Map<String, Object> data = new HashMap<>();
         Set<MinecraftPlayer> recipients = this.collectionToMinecraftPlayer(event.getChannel().get().getMembers());
-        data.put(QuitEndpoint.SENDER_NAME, event.getCause().first(Player.class).get().getName());
+        data.put(QuitEndpoint.SENDER_NAME, player.getName());
         data.put(QuitEndpoint.RECIPIENT_NAMES, recipients);
         this.getPlugin().getEndpointManager().sendMessage(new Message(this, event.getTargetEntity().getName() + " left the game", data));
     }

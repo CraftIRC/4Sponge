@@ -31,6 +31,7 @@ import org.kitteh.craftirc.util.MinecraftPlayer;
 import org.kitteh.craftirc.util.loadable.Loadable;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.Text;
@@ -66,9 +67,9 @@ public class ChatEndpoint extends MinecraftEndpoint {
     }
 
     @Listener
-    public void onChat(@Nonnull MessageChannelEvent.Chat event) {
-        if (!event.getChannel().isPresent() || !event.getCause().first(Player.class).isPresent()) {
-            return; // Not a player chatting
+    public void onChat(@Nonnull MessageChannelEvent.Chat event, @First Player player) {
+        if (!event.getChannel().isPresent()) {
+            return;
         }
         Map<String, Object> data = new HashMap<>();
         Text text = event.getOriginalMessage();
