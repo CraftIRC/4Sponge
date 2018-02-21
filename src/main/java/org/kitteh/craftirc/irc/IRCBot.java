@@ -118,11 +118,11 @@ public final class IRCBot {
         data.put(IRCEndpoint.IRC_MESSAGE_TYPE, messageType);
         StringBuilder modes = new StringBuilder();
         Optional<SortedSet<ChannelUserMode>> userModes = channel.getUserModes(sender);
-        if (userModes.isPresent()) {
-            for (ChannelUserMode mode : userModes.get()) {
+        userModes.ifPresent(channelUserModes -> {
+            for (ChannelUserMode mode : channelUserModes) {
                 modes.append(mode.getNickPrefix());
             }
-        }
+        });
         data.put(IRCEndpoint.IRC_PREFIX, (modes.length() == 0) ? "" : modes.charAt(0));
         data.put(IRCEndpoint.IRC_PREFIXES, modes.toString());
         data.put(IRCEndpoint.IRC_NICK, sender.getNick());
