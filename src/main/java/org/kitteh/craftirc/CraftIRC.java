@@ -85,7 +85,6 @@ public final class CraftIRC {
     @Listener
     public void init(@Nonnull GameInitializationEvent event) {
         this.startMeUp();
-        System.out.println("Hello again");
     }
 
     @Listener
@@ -179,6 +178,8 @@ public final class CraftIRC {
             this.linkManager = new LinkManager(this, links);
         } catch (Exception e) {
             this.logger.error("Uh oh", new CraftIRCUnableToStartException("Could not start CraftIRC!", e));
+            this.dontMakeAGrownManCry();
+            return;
         }
         this.getFilterManager().registerArgumentProvider(CraftIRC.class, () -> CraftIRC.this);
         this.getFilterManager().registerType(PermissionFilter.class);
